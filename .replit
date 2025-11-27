@@ -40,4 +40,5 @@ externalPort = 3000
 
 [deployment]
 deploymentTarget = "vm"
-run = ["bash", "-c", "cd frontend && npm run build && cd ../backend && python run.py"]
+run = ["bash", "-c", "cd backend && python run.py & cd frontend && npm run dev"]
+build = ["bash", "-c", "cd frontend && npm run build"]
