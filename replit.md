@@ -86,8 +86,16 @@ frontend/
 
 👤 **Admin Features**
 - Manage all resources (create, update, delete)
-- View all users
-- Reset any user's password
+- User Password Management section in Settings
+- Reset any user's password with new password
+- View all registered users with join dates
+
+🎨 **User-Specific Themes**
+- Each user has their own theme (per-user, not global!)
+- Saved to database - persists across sessions
+- Supports light/dark mode + color scheme customization
+- When user logs out and back in, their theme is restored
+- Every user can customize independently
 
 ## Key Endpoints
 

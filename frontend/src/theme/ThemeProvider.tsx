@@ -1,6 +1,7 @@
 // src/theme/ThemeProvider.tsx
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 type ThemeMode = 'light' | 'dark';
 interface ThemeShape {
@@ -53,19 +54,23 @@ function hexToHSL(hex: string): string {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<ThemeMode>(() => {
-    try {
-      const s = localStorage.getItem(KEY);
-      if (s) {
-        const parsed = JSON.parse(s);
-        return (parsed.mode as ThemeMode) || 'light';
-      }
-    } catch {}
-    return 'light';
-  });
-
+  const { user } = useAuth();
+  const [theme, setTheme] = useState<ThemeMode>('light');
   const [remoteConfig, setRemoteConfig] = useState<ThemeShape | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Define saveTheme early so it's available for useEffects
+  const saveTheme = async (cfg?: Partial<ThemeShape>) => {
+    // merge with remote config - keep all user-specific settings
+    const payload = { ...(remoteConfig || {}), ...(cfg || {}), mode: cfg?.mode || theme };
+    try {
+      await api.updateTheme(payload);
+      setRemoteConfig(payload);
+    } catch (err) {
+      console.error('saveTheme failed', err);
+      throw err;
+    }
+  };
 
   // set dark class for CSS (Tailwind/Shadcn standard)
   useEffect(() => {
@@ -75,20 +80,30 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       root.classList.remove('dark');
     }
-    // persist minimal shape
-    try {
-      localStorage.setItem(KEY, JSON.stringify({ mode: theme }));
-    } catch {}
   }, [theme]);
 
-  // load remote config on mount (if user is authenticated)
+  // Save theme mode change to backend (per user)
+  useEffect(() => {
+    if (user && theme) {
+      const saveMode = async () => {
+        try {
+          await saveTheme({ mode: theme });
+        } catch (err) {
+          // Silently fail - theme is still applied locally
+        }
+      };
+      saveMode();
+    }
+  }, [theme, user, remoteConfig]);
+
+  // load remote config when user logs in (user-specific theme)
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        // Only fetch theme if user is authenticated (has token)
+        // Only fetch theme if user is authenticated
         const token = localStorage.getItem('access_token');
-        if (!token) {
+        if (!token || !user) {
           setLoading(false);
           return;
         }
@@ -97,11 +112,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         if (!mounted) return;
         if (cfg) {
           setRemoteConfig(cfg);
-          // Only adopt remote mode if user has explicitly saved a preference
-          // Otherwise keep local/default (light mode)
-          const localPreference = localStorage.getItem(KEY);
-          if (localPreference && (cfg as any).mode) {
+          
+          // Use user's saved theme mode
+          if ((cfg as any).mode) {
             setTheme((cfg as any).mode as ThemeMode);
+          } else {
+            setTheme('light'); // default
           }
           
           // Apply saved CSS variables if present
@@ -114,34 +130,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             const accentHSL = hexToHSL((cfg as any).accentColor);
             document.documentElement.style.setProperty('--accent', accentHSL);
           }
+        } else {
+          setTheme('light');
         }
       } catch (err) {
-        // backend may not implement /api/theme — ignore silently
-        // console.warn('getTheme failed', err);
+        // backend may not have theme — ignore silently
+        setTheme('light');
       } finally {
         if (mounted) setLoading(false);
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [user]);
 
   const setThemeMode = (m: ThemeMode) => setTheme(m);
   const toggle = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
-
-  const saveTheme = async (cfg?: Partial<ThemeShape>) => {
-    // merge with remote config
-    const payload = { ...(remoteConfig || {}), ...(cfg || {}), mode: cfg?.mode || theme };
-    try {
-      await api.updateTheme(payload);
-      setRemoteConfig(payload);
-      // persist locally as well
-      try { localStorage.setItem(KEY, JSON.stringify(payload)); } catch {}
-    } catch (err) {
-      // bubble up if needed or swallow
-      console.error('saveTheme failed', err);
-      throw err;
-    }
-  };
 
   const value: ThemeContextValue = {
     theme,
