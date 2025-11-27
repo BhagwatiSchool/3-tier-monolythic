@@ -90,12 +90,13 @@ frontend/
 - Reset any user's password with new password
 - View all registered users with join dates
 
-🎨 **User-Specific Themes**
+🎨 **User-Specific Themes** ✅ FIXED
 - Each user has their own theme (per-user, not global!)
 - Saved to database - persists across sessions
 - Supports light/dark mode + color scheme customization
 - When user logs out and back in, their theme is restored
 - Every user can customize independently
+- **Fixed infinite loop issue** - removed remoteConfig dependency from save effect
 
 ## Key Endpoints
 

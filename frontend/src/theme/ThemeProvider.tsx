@@ -58,6 +58,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<ThemeMode>('light');
   const [remoteConfig, setRemoteConfig] = useState<ThemeShape | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Define saveTheme early so it's available for useEffects
   const saveTheme = async (cfg?: Partial<ThemeShape>) => {
@@ -82,29 +83,33 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [theme]);
 
-  // Save theme mode change to backend (per user)
+  // Save theme mode change to backend (per user) - only on theme change, NOT on remoteConfig change
   useEffect(() => {
-    if (user && theme) {
-      const saveMode = async () => {
-        try {
-          await saveTheme({ mode: theme });
-        } catch (err) {
-          // Silently fail - theme is still applied locally
-        }
-      };
-      saveMode();
-    }
-  }, [theme, user, remoteConfig]);
+    // Skip saving during initial load - wait until theme is loaded from server
+    if (isInitialLoad || !user) return;
+    
+    const saveMode = async () => {
+      try {
+        await saveTheme({ mode: theme });
+      } catch (err) {
+        // Silently fail - theme is still applied locally
+      }
+    };
+    saveMode();
+  }, [theme, user]);
 
   // load remote config when user logs in (user-specific theme)
   useEffect(() => {
     let mounted = true;
+    setIsInitialLoad(true);
+    
     (async () => {
       try {
         // Only fetch theme if user is authenticated
         const token = localStorage.getItem('access_token');
         if (!token || !user) {
           setLoading(false);
+          setIsInitialLoad(false);
           return;
         }
         
@@ -137,7 +142,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         // backend may not have theme — ignore silently
         setTheme('light');
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+          setIsInitialLoad(false);
+        }
       }
     })();
     return () => { mounted = false; };
