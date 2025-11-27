@@ -15,18 +15,8 @@ def get_user_resources(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get resources - admin sees all, others see only finalized"""
-    from app.models.user import UserRole
-    
-    if current_user.role == UserRole.admin:
-        # Admin sees ALL their resources
-        resources = db.query(Resource).filter(Resource.user_id == current_user.id).all()
-    else:
-        # Regular users see ONLY finalized resources
-        resources = db.query(Resource).filter(
-            Resource.user_id == current_user.id,
-            Resource.is_finalized == True
-        ).all()
+    """Get all resources for the current user"""
+    resources = db.query(Resource).filter(Resource.user_id == current_user.id).all()
     
     # Convert UUID to string for response
     return [
@@ -39,7 +29,6 @@ def get_user_resources(
             description=r.description,
             status=r.status,
             region=r.region,
-            is_finalized=r.is_finalized,
             created_at=r.created_at,
             updated_at=r.updated_at
         )
@@ -81,7 +70,6 @@ def create_resource(
         description=resource.description,
         status=resource.status,
         region=resource.region,
-        is_finalized=resource.is_finalized,
         created_at=resource.created_at,
         updated_at=resource.updated_at
     )
@@ -130,56 +118,11 @@ def update_resource(
         description=resource.description,
         status=resource.status,
         region=resource.region,
-        is_finalized=resource.is_finalized,
         created_at=resource.created_at,
         updated_at=resource.updated_at
     )
 
 
-@router.patch("/{resource_id}/finalize", response_model=ResourceResponse)
-def finalize_resource(
-    resource_id: int,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """Mark resource as finalized (admin only)"""
-    from app.models.user import UserRole
-    
-    # Only admin can finalize
-    if current_user.role != UserRole.admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can finalize resources"
-        )
-    
-    resource = db.query(Resource).filter(
-        Resource.id == resource_id,
-        Resource.user_id == current_user.id
-    ).first()
-    
-    if not resource:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Resource not found"
-        )
-    
-    resource.is_finalized = True
-    db.commit()
-    db.refresh(resource)
-    
-    return ResourceResponse(
-        id=resource.id,
-        user_id=str(resource.user_id),
-        icon=resource.icon,
-        title=resource.title,
-        resource_name=resource.resource_name,
-        description=resource.description,
-        status=resource.status,
-        region=resource.region,
-        is_finalized=resource.is_finalized,
-        created_at=resource.created_at,
-        updated_at=resource.updated_at
-    )
 
 
 @router.delete("/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)
