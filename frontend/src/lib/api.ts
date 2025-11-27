@@ -6,8 +6,18 @@ const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE) return import.meta.env.VITE_API_BASE;
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
   
-  // In development, use relative URL (proxy will handle routing to backend)
-  // In production, use environment variable
+  // In Replit: use the same domain but different port for backend
+  // Frontend runs on 5000, backend on 8000
+  if (window.location.hostname.includes('replit.dev')) {
+    return `${window.location.protocol}//${window.location.hostname}:8000`;
+  }
+  
+  // Local development
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8000';
+  }
+  
+  // Fallback: use relative URL
   return "";
 };
 
