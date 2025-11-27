@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum as SQLEnum, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -34,6 +34,7 @@ class Resource(Base):
     description = Column(String(500))
     status = Column(String(20), default=ResourceStatus.RUNNING.value)
     region = Column(String(50), default="East US")
+    is_finalized = Column(Boolean, default=False, nullable=False)  # Admin approval flag
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

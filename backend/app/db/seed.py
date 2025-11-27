@@ -4,17 +4,8 @@ from app.models.user import User
 
 
 def seed_default_resources(db: Session, user_id: str):
-    """Seed default resources for a new user (only on first creation)"""
-    
-    # Check if user has EVER had resources (using a marker resource)
-    # This prevents re-seeding if user deletes all resources
-    marker = db.query(Resource).filter(
-        Resource.user_id == user_id,
-        Resource.resource_name == "__seedmarker__"
-    ).first()
-    
-    if marker:
-        return  # Already seeded before, don't seed again
+    """DO NOT auto-seed resources anymore. Admin must finalize resources explicitly."""
+    return  # Resources are now manually managed by admin
     
     # Default resources to create
     default_resources = [

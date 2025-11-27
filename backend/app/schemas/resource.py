@@ -23,6 +23,7 @@ class ResourceUpdate(ResourceBase):
 class ResourceResponse(ResourceBase):
     id: int
     user_id: str
+    is_finalized: bool
     created_at: datetime
     updated_at: datetime
 
