@@ -2,34 +2,20 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type { LoginResponse, RegisterResponse, ProfileResponse } from '@/types/api';
 
-const getApiBaseUrl = () => {
-  if (import.meta.env.VITE_API_BASE) return import.meta.env.VITE_API_BASE;
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  
-  // In browser: dynamically compute based on current location
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol; // https: or http:
-    
-    // Replit: use same domain with port 8000
-    if (hostname.includes('replit.dev')) {
-      return `${protocol}//${hostname}:8000`;
-    }
-    
-    // Local development: use localhost:8000
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:8000';
-    }
-  }
-  
-  // Server-side: return empty (will use relative URLs)
-  return "";
-};
-
-// Compute at runtime, not at module load time
 let API_BASE_URL = "";
+
+// Compute API URL at runtime
 if (typeof window !== 'undefined') {
-  API_BASE_URL = getApiBaseUrl();
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  
+  if (hostname.includes('replit.dev')) {
+    // Replit: use same domain, port 8000, same protocol
+    API_BASE_URL = `${protocol}//${hostname}:8000`;
+  } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    // Local development
+    API_BASE_URL = 'http://localhost:8000';
+  }
 }
 
 const apiClient: AxiosInstance = axios.create({
