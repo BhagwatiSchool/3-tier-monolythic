@@ -139,7 +139,7 @@ export default function Settings() {
       closeResourceModal();
     },
     onError: () => {
-      toast.error('Failed to create resource');
+      // Silently fail - don't show error toast
     },
   });
 
@@ -154,7 +154,7 @@ export default function Settings() {
       closeResourceModal();
     },
     onError: () => {
-      toast.error('Failed to update resource');
+      // Silently fail - don't show error toast
     },
   });
 
@@ -168,7 +168,7 @@ export default function Settings() {
       toast.success('Resource deleted successfully!');
     },
     onError: () => {
-      toast.error('Failed to delete resource');
+      // Silently fail - don't show error toast
     },
   });
 
@@ -299,7 +299,8 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        {/* Edit Resources Section */}
+        {/* Edit Resources Section - Admin Only */}
+        {user?.role === 'admin' && (
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold">Edit Resources</h2>
@@ -383,6 +384,8 @@ export default function Settings() {
             </div>
           )}
         </div>
+        )}
+        {/* End Admin Only Section */}
 
         {/* Resource Edit Modal */}
         <Dialog open={isResourceModalOpen} onOpenChange={setIsResourceModalOpen}>
