@@ -14,7 +14,7 @@ import {
 import { api } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, AlertCircle, Users, User, Crown, ArrowLeft, Trash2, Lock } from 'lucide-react';
+import { Shield, AlertCircle, Users, User, ArrowLeft, Trash2, Lock } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -71,10 +71,10 @@ export default function UserManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-users'] });
-      toast.success('User role updated successfully!');
+      toast({ title: 'Success', description: 'User role updated successfully!' });
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.detail || 'Failed to update user role');
+      toast({ title: 'Error', description: error?.response?.data?.detail || 'Failed to update user role', variant: 'destructive' });
     },
   });
 
@@ -85,11 +85,11 @@ export default function UserManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-users'] });
-      toast.success('User deleted successfully!');
+      toast({ title: 'Success', description: 'User deleted successfully!' });
       setDeleteUserId(null);
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.detail || 'Failed to delete user');
+      toast({ title: 'Error', description: error?.response?.data?.detail || 'Failed to delete user', variant: 'destructive' });
       setDeleteUserId(null);
     },
   });
@@ -170,20 +170,20 @@ export default function UserManagement() {
                   return (
                     <Card key={user.id}>
                       <CardContent className="py-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                          <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 mb-2">
-                              <RoleIcon className={`h-5 w-5 ${roleColors[user.role]}`} />
-                              <div className="flex items-center gap-2">
-                                <div>
-                                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                                    {user.display_name || user.email}
-                                    {user.is_protected && (
-                                      <Lock className="h-4 w-4 text-yellow-600" title="Protected User" />
-                                    )}
-                                  </h3>
-                                  <p className="text-sm text-muted-foreground">{user.email}</p>
-                                </div>
+                              <RoleIcon className={`h-5 w-5 flex-shrink-0 ${roleColors[user.role]}`} />
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-lg flex items-center gap-2 break-words">
+                                  {user.display_name || user.email}
+                                  {user.is_protected && (
+                                    <div title="Protected User" className="flex-shrink-0">
+                                      <Lock className="h-4 w-4 text-yellow-600" />
+                                    </div>
+                                  )}
+                                </h3>
+                                <p className="text-sm text-muted-foreground break-all">{user.email}</p>
                               </div>
                             </div>
                             <p className="text-xs text-muted-foreground">
@@ -191,8 +191,8 @@ export default function UserManagement() {
                             </p>
                           </div>
                           
-                          <div className="flex items-center gap-3">
-                            <div className="w-48">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
+                            <div className="w-full sm:w-48">
                               <Select
                                 value={user.role}
                                 onValueChange={(value) => handleRoleChange(user.id, value)}
@@ -220,7 +220,7 @@ export default function UserManagement() {
                             
                             {user.is_protected ? (
                               <div className="flex items-center gap-2 text-xs text-yellow-700 italic">
-                                <Lock className="h-4 w-4" />
+                                <Lock className="h-4 w-4 flex-shrink-0" />
                                 <span>Protected</span>
                               </div>
                             ) : (
@@ -229,6 +229,7 @@ export default function UserManagement() {
                                 size="sm"
                                 onClick={() => setDeleteUserId(user.id)}
                                 disabled={deleteUserMutation.isPending}
+                                className="w-full sm:w-auto"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete

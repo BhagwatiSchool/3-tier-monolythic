@@ -1,4 +1,5 @@
-# Resource Management Dashboard - Complete Deployment Guide
+<h1 id="top">🚀 Resource Management Dashboard - Complete Deployment Guide</h1>
+
 
 > **3-Tier Azure Architecture**: Frontend (React) + Backend (Python FastAPI) + Azure SQL Database
 
@@ -8,20 +9,22 @@ This guide will take you from **ZERO to FULL PRODUCTION** deployment on Azure VM
 
 ## 📋 Table of Contents
 
-1. [Project Overview](#-project-overview)
-2. [Architecture](#-architecture)
-3. [Tech Stack](#-tech-stack)
-4. [Prerequisites](#-prerequisites)
-5. [Local Development Setup (Windows)](#-local-development-setup-windows)
-6. [Backend Deployment on Ubuntu VM](#-backend-deployment-on-ubuntu-vm)
-7. [Frontend Deployment on Ubuntu VM](#-frontend-deployment-on-ubuntu-vm)
-8. [Azure SQL Database Setup](#-azure-sql-database-setup)
-9. [Testing & Verification](#-testing--verification)
-10. [Troubleshooting](#-troubleshooting)
-11. [Production Checklist](#-production-checklist)
+1. [Project Overview](#project-overview)
+2. [Architecture](#architecture)
+3. [Tech Stack](#tech-stack)
+4. [Prerequisites](#prerequisites)
+5. [Local Development Setup (Windows)](#local-development-setup-windows)
+6. [Backend Deployment on Ubuntu VM](#backend-deployment-on-ubuntu-vm)
+7. [Frontend Deployment on Ubuntu VM](#frontend-deployment-on-ubuntu-vm)
+8. [Azure SQL Database Setup](#azure-sql-database-setup)
+9. [Testing & Verification](#testing-verification)
+10. [Troubleshooting](#troubleshooting)
+11. [Production Checklist](#production-checklist)
 
 ---
 
+<!-- <h1 id="Project Overview">🎯 Project Overview</h1> -->
+<a id="project-overview"></a>
 ## 🎯 Project Overview
 
 A modern resource management dashboard converted from Lovable to 3-tier Azure architecture:
@@ -33,7 +36,8 @@ A modern resource management dashboard converted from Lovable to 3-tier Azure ar
 **Deployment Target**: Separate Azure Ubuntu VMs for frontend and backend.
 
 ---
-
+[↑ Back to Top](#top)  
+<a id="architecture"></a>
 ## 🏗️ Architecture
 
 ```
@@ -61,9 +65,9 @@ A modern resource management dashboard converted from Lovable to 3-tier Azure ar
 │   Port: 1433        │
 └─────────────────────┘
 ```
+[↑ Back to Top](#top)
 
----
-
+<a id="tech-stack"></a>
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -87,7 +91,10 @@ A modern resource management dashboard converted from Lovable to 3-tier Azure ar
 - Connection pooling enabled
 
 ---
+[↑ Back to Top](#top)
 
+
+<a id="prerequisites"></a>
 ## ✅ Prerequisites
 
 ### For Local Development (Windows)
@@ -105,7 +112,9 @@ A modern resource management dashboard converted from Lovable to 3-tier Azure ar
 - ✅ Firewall rules configured
 
 ---
+[↑ Back to Top](#top)  
 
+<a id="local-development-setup-windows"></a>  
 ## 💻 Local Development Setup (Windows)
 
 ### Step 1: Clone the Repository
@@ -198,7 +207,9 @@ npm run dev
 You should see: **"Frontend is Working! 🎉"**
 
 ---
+[↑ Back to Top](#top)  
 
+<a id="backend-deployment-on-ubuntu-vm"></a>
 ## 🚀 Backend Deployment on Ubuntu VM
 
 ### Step 1: Connect to Backend VM
@@ -393,7 +404,9 @@ curl http://YOUR-BACKEND-VM-IP:8000/health
 ✅ **Backend Deployment Complete!**
 
 ---
+[↑ Back to Top](#top)   
 
+<a id="frontend-deployment-on-ubuntu-vm"></a>
 ## 🎨 Frontend Deployment on Ubuntu VM
 
 ### Step 1: Connect to Frontend VM
@@ -544,7 +557,9 @@ You should see: **"Frontend is Working! 🎉"**
 ✅ **Frontend Deployment Complete!**
 
 ---
-
+[↑ Back to Top](#top)    
+  
+<a id="azure-sql-database-setup"></a>
 ## 🗄️ Azure SQL Database Setup
 
 ### Step 1: Create Azure SQL Database
@@ -586,7 +601,9 @@ EOF
 ```
 
 ---
+[↑ Back to Top](#top)
 
+<a id="testing-verification"></a>
 ## ✅ Testing & Verification
 
 ### Backend Health Check
@@ -626,7 +643,9 @@ sudo tail -f /var/log/nginx/error.log   # Error logs
 ```
 
 ---
-
+[↑ Back to Top](#top)  
+  
+<a id="troubleshooting"></a>
 ## 🔧 Troubleshooting
 
 ### Problem 1: Backend not starting
@@ -699,7 +718,9 @@ sudo systemctl restart resource-backend
 ```
 
 ---
-
+[↑ Back to Top](#top)  
+  
+<a id="production-checklist"></a>
 ## 📝 Production Checklist
 
 ### Security

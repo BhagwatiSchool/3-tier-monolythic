@@ -71,9 +71,9 @@ export default function Resources() {
   // Fetch resources from API
   const { data: resources = [], isLoading } = useQuery<Resource[]>({
     queryKey: ['resources'],
-    queryFn: async () => {
+    queryFn: async (): Promise<Resource[]> => {
       const response = await api.getResources();
-      return response || [];
+      return (Array.isArray(response) ? response : []) as Resource[];
     },
   });
 

@@ -47,6 +47,7 @@ interface Resource {
   description: string;
   status: string;
   region: string;
+  created_at: string;
 }
 
 const iconOptions = [
@@ -103,8 +104,9 @@ export default function Settings() {
   // Fetch resources
   const { data: resources = [], isLoading: resourcesLoading } = useQuery<Resource[]>({
     queryKey: ['resources'],
-    queryFn: async () => {
-      return await api.getResources();
+    queryFn: async (): Promise<Resource[]> => {
+      const response = await api.getResources();
+      return (Array.isArray(response) ? response : []) as Resource[];
     },
   });
 

@@ -1,6 +1,6 @@
 // src/lib/api.ts
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import type { LoginResponse, RegisterResponse, ProfileResponse, Theme } from '@/types/api';
+import type { LoginResponse, RegisterResponse, ProfileResponse } from '@/types/api';
 
 const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE) return import.meta.env.VITE_API_BASE;
