@@ -4,16 +4,28 @@ from app.models.user import User
 
 
 def seed_default_resources(db: Session, user_id: str):
-    """Seed default resources for a new user if they don't have any"""
+    """Seed default resources for a new user (only on first creation)"""
     
-    # Check if user already has resources
-    existing_count = db.query(Resource).filter(Resource.user_id == user_id).count()
+    # Check if user has EVER had resources (using a marker resource)
+    # This prevents re-seeding if user deletes all resources
+    marker = db.query(Resource).filter(
+        Resource.user_id == user_id,
+        Resource.resource_name == "__seedmarker__"
+    ).first()
     
-    if existing_count > 0:
-        return  # User already has resources, don't seed again
+    if marker:
+        return  # Already seeded before, don't seed again
     
     # Default resources to create
     default_resources = [
+        {
+            "icon": "flag",
+            "title": "Seed Marker",
+            "resource_name": "__seedmarker__",
+            "description": "Internal marker (hidden from UI)",
+            "status": "Hidden",
+            "region": "Global"
+        },
         {
             "icon": "server",
             "title": "Virtual Machine",
