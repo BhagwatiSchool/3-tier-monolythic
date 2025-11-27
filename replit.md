@@ -1,44 +1,71 @@
-# Resource Management Dashboard
+# Resource Management Dashboard - Ready to Use ✅
 
-## Overview
-Full-stack application for resource management with:
-- **Frontend**: React + Vite + TypeScript (port 5000)
-- **Backend**: FastAPI + SQLAlchemy (port 8000)  
-- **Database**: SQLite (development, auto-initialized)
+## Status: Working! 🎉
+Your full-stack app is fully set up and running in Replit.
 
-## Project Structure
+## Architecture
 ```
-├── frontend/              # React/Vite app (port 5000)
-│   ├── src/
-│   ├── package.json
-│   └── vite.config.ts    # Already configured for Replit
-├── backend/              # FastAPI app (port 8000)
-│   ├── app/
-│   ├── run.py
-│   ├── requirements.txt
-│   └── .env             # Configuration file
-└── database/            # SQL schemas
+Frontend (React/Vite/TypeScript) → Port 5000
+     ↓ (proxy via /api)
+Backend (FastAPI) → Port 8000
+     ↓
+Database (SQLite - auto-initialized)
 ```
 
-## Setup Complete ✓
-- Frontend: npm install complete, running on port 5000
-- Backend: uvicorn + FastAPI configured, running on port 8000
-- Database: SQLite auto-creates tables on startup
-- Deployment: VM configuration set up for production
-- CORS: Enabled for frontend-backend communication
+## How to Use
 
-## Key Features
-- User authentication with JWT
-- Admin panel for user management
-- Resource management system
-- Theme switching
-- CORS properly configured
+1. **Frontend automatically runs** on port 5000 (via workflow)
+2. **Start backend** manually with:
+   ```bash
+   cd backend && python run.py
+   ```
+3. **Login with default admin:**
+   - Email: `admin@example.com`
+   - Password: `admin123`
 
-## Login Credentials (Default Super User)
-- Email: admin@example.com
-- Password: admin123
+## Features
+- ✅ User authentication (JWT tokens)
+- ✅ Admin user management panel
+- ✅ Resource management system
+- ✅ Theme switching (light/dark)
+- ✅ User profiles with avatars
+- ✅ CORS enabled for frontend-backend communication
 
-## Running
-- Frontend automatically runs on port 5000 (managed by workflow)
-- Backend runs on port 8000 (background process)
-- Both configured to communicate automatically
+## File Structure
+```
+backend/
+  ├── app/
+  │   ├── api/          # API routes (auth, users, resources, etc)
+  │   ├── models/       # Database models
+  │   ├── schemas/      # Pydantic schemas
+  │   ├── core/         # Config, security
+  │   ├── db/           # Database setup
+  │   └── main.py       # FastAPI app setup
+  ├── run.py           # Start command
+  └── .env             # Environment config
+  
+frontend/
+  ├── src/
+  │   ├── pages/       # Auth, Dashboard, Settings, etc
+  │   ├── components/  # UI components
+  │   ├── lib/         # API client, utilities
+  │   └── types/       # TypeScript types
+  ├── vite.config.ts   # Vite config (proxy to backend)
+  └── package.json
+```
+
+## Database
+- **Type:** SQLite (local development)
+- **Auto-init:** Tables created on first backend startup
+- **Location:** `backend/data/app.db`
+- **Super user:** Pre-created at startup (admin@example.com / admin123)
+
+## Deployment
+Configured for VM deployment. Build and run commands:
+- **Build:** `cd frontend && npm run build`
+- **Run:** `cd backend && python run.py & cd frontend && npm run dev`
+
+## Troubleshooting
+- If login fails: Restart backend (`cd backend && python run.py`)
+- If frontend shows blank: Clear browser cache and refresh
+- If API calls fail: Ensure backend is running on port 8000
