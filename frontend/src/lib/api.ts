@@ -114,6 +114,19 @@ export const api = {
     return unwrap(res);
   },
 
+  // Users Management (Admin only)
+  getUsers: async (): Promise<any[]> => {
+    const res = await apiClient.get('/api/users/');
+    return unwrap<any[]>(res);
+  },
+
+  resetUserPassword: async (userId: string, newPassword: string) => {
+    const res = await apiClient.post(`/api/users/${userId}/reset-password`, {
+      new_password: newPassword
+    });
+    return unwrap(res);
+  },
+
   // Theme - now returns user-specific theme object directly
   getTheme: async (): Promise<any> => {
     const res = await apiClient.get('/api/theme/');

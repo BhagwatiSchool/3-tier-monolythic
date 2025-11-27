@@ -93,6 +93,11 @@ export default function Settings() {
     created_at: new Date().toISOString().slice(0, 16)
   });
 
+  // Users Management State
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
+  const [selectedUserForReset, setSelectedUserForReset] = useState<any | null>(null);
+  const [resetPasswordValue, setResetPasswordValue] = useState('');
+
   // Fetch user data
   useEffect(() => {
     if (user) {
@@ -108,6 +113,20 @@ export default function Settings() {
       const response = await api.getResources();
       return (Array.isArray(response) ? response : []) as Resource[];
     },
+  });
+
+  // Fetch users (admin only)
+  const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useQuery<any[]>({
+    queryKey: ['users'],
+    queryFn: async (): Promise<any[]> => {
+      try {
+        const response = await api.getUsers();
+        return (Array.isArray(response) ? response : []) as any[];
+      } catch {
+        return [];
+      }
+    },
+    enabled: user?.role === 'admin'
   });
 
   // Update Creator Info
@@ -172,6 +191,23 @@ export default function Settings() {
     },
   });
 
+  // Reset User Password
+  const resetPassword = useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
+      return await api.resetUserPassword(userId, password);
+    },
+    onSuccess: () => {
+      refetchUsers();
+      toast.success('Password reset successfully!');
+      setIsResetPasswordModalOpen(false);
+      setSelectedUserForReset(null);
+      setResetPasswordValue('');
+    },
+    onError: () => {
+      toast.error('Failed to reset password');
+    },
+  });
+
   const handleSaveCreatorInfo = () => {
     updateCreatorInfo.mutate();
   };
@@ -229,6 +265,16 @@ export default function Settings() {
   const handleDeleteResource = (id: number) => {
     if (confirm('Are you sure you want to delete this resource?')) {
       deleteResource.mutate(id);
+    }
+  };
+
+  const handleResetPassword = () => {
+    if (!resetPasswordValue || resetPasswordValue.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    if (selectedUserForReset) {
+      resetPassword.mutate({ userId: selectedUserForReset.id, password: resetPasswordValue });
     }
   };
 
@@ -385,7 +431,104 @@ export default function Settings() {
           )}
         </div>
         )}
-        {/* End Admin Only Section */}
+        {/* Users Management Section - Admin Only */}
+        {user?.role === 'admin' && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold">User Management</h2>
+          </div>
+
+          {usersLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
+              <p className="mt-4 text-muted-foreground">Loading users...</p>
+            </div>
+          ) : users.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground">No users found</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {users.map((u) => (
+                <Card key={u.id}>
+                  <CardContent className="py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{u.display_name || u.email.split('@')[0]}</h3>
+                        <p className="text-sm text-muted-foreground">{u.email}</p>
+                        <p className="text-xs text-muted-foreground">Member since {new Date(u.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUserForReset(u);
+                            setResetPasswordValue('');
+                            setIsResetPasswordModalOpen(true);
+                          }}
+                        >
+                          🔑 Reset Password
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+        )}
+        {/* End Users Management Section */}
+
+        {/* Reset Password Modal */}
+        <Dialog open={isResetPasswordModalOpen} onOpenChange={setIsResetPasswordModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reset Password</DialogTitle>
+            </DialogHeader>
+            {selectedUserForReset && (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Resetting password for: <span className="font-semibold">{selectedUserForReset.email}</span>
+                  </p>
+                  <Label htmlFor="new-password">New Password</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={resetPasswordValue}
+                    onChange={(e) => setResetPasswordValue(e.target.value)}
+                    placeholder="Enter new password (min 6 chars)"
+                    className="mt-2"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleResetPassword}
+                    disabled={resetPassword.isPending}
+                    className="flex-1"
+                  >
+                    Reset Password
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsResetPasswordModalOpen(false);
+                      setSelectedUserForReset(null);
+                      setResetPasswordValue('');
+                    }}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Resource Edit Modal */}
         <Dialog open={isResourceModalOpen} onOpenChange={setIsResourceModalOpen}>
