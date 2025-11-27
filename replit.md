@@ -152,3 +152,10 @@ Everything works! Start using your dashboard now! 🚀
 - ✅ Save on user changes
 - ✅ No infinite loop (fixed useEffect dependencies)
 - ✅ Backend API: GET/PUT /api/theme/
+
+### Template Resources ✅
+- ✅ Admin can import 6 default template resources with one click
+- ✅ Templates include: Web Server, Database, Cache, Load Balancer, Storage, API Gateway
+- ✅ Admin still can create additional custom resources
+- ✅ Button appears when no resources exist
+- ✅ Endpoint: POST /api/resources/seed/templates

@@ -162,6 +162,11 @@ export const api = {
     return unwrap(res);
   },
 
+  seedTemplateResources: async () => {
+    const res = await apiClient.post('/api/resources/seed/templates');
+    return unwrap(res);
+  },
+
   createResource: async (data: any) => {
     const res = await apiClient.post('/api/resources/', data);
     return unwrap(res);

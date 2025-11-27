@@ -151,6 +151,103 @@ def update_resource(
 
 
 
+@router.post("/seed/templates", response_model=List[ResourceResponse], status_code=status.HTTP_201_CREATED)
+def seed_template_resources(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Seed default template resources - admin only"""
+    from app.models.user import UserRole
+    
+    if current_user.role != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admins can seed resources"
+        )
+    
+    # Template resources
+    templates = [
+        {
+            "title": "Web Server",
+            "resource_name": "nginx-prod-01",
+            "description": "Production nginx web server",
+            "icon": "server",
+            "status": "Running",
+            "region": "us-east-1"
+        },
+        {
+            "title": "Database",
+            "resource_name": "postgres-db-01",
+            "description": "Primary PostgreSQL database",
+            "icon": "database",
+            "status": "Running",
+            "region": "us-east-1"
+        },
+        {
+            "title": "Cache Server",
+            "resource_name": "redis-cache-01",
+            "description": "Redis caching layer",
+            "icon": "zap",
+            "status": "Running",
+            "region": "us-east-1"
+        },
+        {
+            "title": "Load Balancer",
+            "resource_name": "lb-prod-01",
+            "description": "Application load balancer",
+            "icon": "network",
+            "status": "Running",
+            "region": "us-east-1"
+        },
+        {
+            "title": "Storage",
+            "resource_name": "s3-bucket-main",
+            "description": "Main S3 storage bucket",
+            "icon": "hard_drive",
+            "status": "Running",
+            "region": "us-east-1"
+        },
+        {
+            "title": "API Gateway",
+            "resource_name": "api-gateway-01",
+            "description": "REST API gateway",
+            "icon": "link",
+            "status": "Running",
+            "region": "us-east-1"
+        }
+    ]
+    
+    created_resources = []
+    for template in templates:
+        resource = Resource(
+            user_id=current_user.id,
+            title=template["title"],
+            resource_name=template["resource_name"],
+            description=template["description"],
+            icon=template["icon"],
+            status=template["status"],
+            region=template["region"]
+        )
+        db.add(resource)
+        db.flush()
+        
+        created_resources.append(ResourceResponse(
+            id=resource.id,
+            user_id=str(resource.user_id),
+            icon=resource.icon,
+            title=resource.title,
+            resource_name=resource.resource_name,
+            description=resource.description,
+            status=resource.status,
+            region=resource.region,
+            created_at=resource.created_at,
+            updated_at=resource.updated_at
+        ))
+    
+    db.commit()
+    return created_resources
+
+
 @router.delete("/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_resource(
     resource_id: int,

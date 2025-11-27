@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -65,8 +65,10 @@ const iconMap: Record<string, any> = {
 
 export default function Resources() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
 
   // Fetch resources from API
   const { data: resources = [], isLoading } = useQuery<Resource[]>({
@@ -80,6 +82,18 @@ export default function Resources() {
   const handleResourceClick = (resource: Resource) => {
     setSelectedResource(resource);
     setIsModalOpen(true);
+  };
+
+  const handleSeedTemplates = async () => {
+    try {
+      setIsSeeding(true);
+      await api.seedTemplateResources();
+      queryClient.invalidateQueries({ queryKey: ['resources'] });
+    } catch (error) {
+      console.error('Failed to seed templates:', error);
+    } finally {
+      setIsSeeding(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -132,11 +146,16 @@ export default function Resources() {
           <Card>
             <CardContent className="py-12 text-center">
               <p className="text-muted-foreground mb-4">
-                No resources found. Add resources from the Settings page.
+                No resources found.
               </p>
-              <Button onClick={() => navigate('/settings')}>
-                Go to Settings
-              </Button>
+              <div className="flex gap-4 justify-center">
+                <Button onClick={handleSeedTemplates} disabled={isSeeding} className="bg-blue-600 hover:bg-blue-700">
+                  {isSeeding ? 'Adding...' : 'Add Template Resources'}
+                </Button>
+                <Button onClick={() => navigate('/settings')} variant="outline">
+                  Go to Settings
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
