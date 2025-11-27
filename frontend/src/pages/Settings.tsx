@@ -440,8 +440,8 @@ export default function Settings() {
                 <UserCircle2 className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <CardTitle className="text-2xl">User Management</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">Manage user accounts and reset passwords</p>
+                <CardTitle className="text-2xl">User Password Management</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">Reset user passwords</p>
               </div>
             </div>
           </CardHeader>
