@@ -6,22 +6,31 @@ const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE) return import.meta.env.VITE_API_BASE;
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
   
-  // In Replit: use the same domain but different port for backend
-  // Frontend runs on 5000, backend on 8000
-  if (window.location.hostname.includes('replit.dev')) {
-    return `${window.location.protocol}//${window.location.hostname}:8000`;
+  // In browser: dynamically compute based on current location
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol; // https: or http:
+    
+    // Replit: use same domain with port 8000
+    if (hostname.includes('replit.dev')) {
+      return `${protocol}//${hostname}:8000`;
+    }
+    
+    // Local development: use localhost:8000
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:8000';
+    }
   }
   
-  // Local development
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://localhost:8000';
-  }
-  
-  // Fallback: use relative URL
+  // Server-side: return empty (will use relative URLs)
   return "";
 };
 
-const API_BASE_URL = getApiBaseUrl();
+// Compute at runtime, not at module load time
+let API_BASE_URL = "";
+if (typeof window !== 'undefined') {
+  API_BASE_URL = getApiBaseUrl();
+}
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
