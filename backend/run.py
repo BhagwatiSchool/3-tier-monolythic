@@ -7,7 +7,7 @@ if __name__ == "__main__":
     
     uvicorn.run(
         "app.main:app",
-        host="127.0.0.1",  # Backend internal only
+        host="0.0.0.0",  # Allow all hosts for Replit frontend access
         port=int(os.getenv("PORT", 8000)),
         reload=is_dev,  # Only reload in development
         workers=1 if is_dev else int(os.getenv("UVICORN_WORKERS", 4))
