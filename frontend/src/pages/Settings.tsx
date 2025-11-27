@@ -433,53 +433,65 @@ export default function Settings() {
         )}
         {/* Users Management Section - Admin Only */}
         {user?.role === 'admin' && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">User Management</h2>
-          </div>
-
-          {usersLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
-              <p className="mt-4 text-muted-foreground">Loading users...</p>
+        <Card className="mb-8 border-blue-200 bg-gradient-to-br from-blue-50 to-transparent">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-lg bg-blue-100">
+                <UserCircle2 className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle className="text-2xl">User Management</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">Manage user accounts and reset passwords</p>
+              </div>
             </div>
-          ) : users.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">No users found</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {users.map((u) => (
-                <Card key={u.id}>
-                  <CardContent className="py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{u.display_name || u.email.split('@')[0]}</h3>
-                        <p className="text-sm text-muted-foreground">{u.email}</p>
-                        <p className="text-xs text-muted-foreground">Member since {new Date(u.created_at).toLocaleDateString()}</p>
+          </CardHeader>
+          <CardContent>
+            {usersLoading ? (
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
+                <p className="mt-4 text-muted-foreground">Loading users...</p>
+              </div>
+            ) : users.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No users found</p>
+            ) : (
+              <div className="space-y-3">
+                {users.map((u) => (
+                  <div key={u.id} className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="w-2 h-2 rounded-full bg-blue-500" />
+                        <h3 className="font-semibold text-gray-900">{u.display_name || u.email.split('@')[0]}</h3>
+                        {u.role === 'admin' && (
+                          <span className="text-xs font-bold px-2 py-1 bg-amber-100 text-amber-700 rounded-full">Admin</span>
+                        )}
                       </div>
-                      <div className="flex gap-2">
+                      <p className="text-sm text-gray-600">{u.email}</p>
+                      <p className="text-xs text-gray-500 mt-1">Joined {new Date(u.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div className="ml-4">
+                      {u.id !== user.id ? (
                         <Button
-                          variant="outline"
-                          size="sm"
                           onClick={() => {
                             setSelectedUserForReset(u);
                             setResetPasswordValue('');
                             setIsResetPasswordModalOpen(true);
                           }}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                          size="sm"
                         >
-                          🔑 Reset Password
+                          <Lock className="mr-2 h-4 w-4" />
+                          Reset Password
                         </Button>
-                      </div>
+                      ) : (
+                        <div className="text-xs text-gray-500 italic">This is you</div>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
         )}
         {/* End Users Management Section */}
 
