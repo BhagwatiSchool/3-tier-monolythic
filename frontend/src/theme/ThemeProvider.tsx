@@ -81,11 +81,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [theme]);
 
-  // load remote config on mount (if backend endpoint present)
+  // load remote config on mount (if user is authenticated)
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
+        // Only fetch theme if user is authenticated (has token)
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+        
         const cfg = await api.getTheme();
         if (!mounted) return;
         if (cfg) {
