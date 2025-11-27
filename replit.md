@@ -154,8 +154,20 @@ Everything works! Start using your dashboard now! 🚀
 - ✅ Backend API: GET/PUT /api/theme/
 
 ### Template Resources ✅
-- ✅ Admin can import 6 default template resources with one click
-- ✅ Templates include: Web Server, Database, Cache, Load Balancer, Storage, API Gateway
-- ✅ Admin still can create additional custom resources
+- ✅ Admin can import 12 Azure-specific template resources with one click
+- ✅ **Azure Templates (12):**
+  1. Azure Virtual Machine
+  2. Azure App Service
+  3. Azure SQL Database
+  4. Azure Cosmos DB
+  5. Azure Storage Account
+  6. Azure Key Vault
+  7. Azure Load Balancer
+  8. Azure API Management
+  9. Azure Container Registry
+  10. Azure Functions
+  11. Azure Service Bus
+  12. Azure Application Insights
+- ✅ Admin can still create additional custom resources
 - ✅ Button appears when no resources exist
 - ✅ Endpoint: POST /api/resources/seed/templates

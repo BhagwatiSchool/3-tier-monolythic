@@ -165,55 +165,103 @@ def seed_template_resources(
             detail="Only admins can seed resources"
         )
     
-    # Template resources
+    # Template resources - Azure specific
     templates = [
         {
-            "title": "Web Server",
-            "resource_name": "nginx-prod-01",
-            "description": "Production nginx web server",
+            "title": "Azure Virtual Machine",
+            "resource_name": "vm-prod-eastus-01",
+            "description": "Windows/Linux VM for compute workloads",
             "icon": "server",
             "status": "Running",
-            "region": "us-east-1"
+            "region": "East US"
         },
         {
-            "title": "Database",
-            "resource_name": "postgres-db-01",
-            "description": "Primary PostgreSQL database",
+            "title": "Azure App Service",
+            "resource_name": "app-service-api-prod",
+            "description": "Managed web app hosting",
+            "icon": "globe",
+            "status": "Running",
+            "region": "East US"
+        },
+        {
+            "title": "Azure SQL Database",
+            "resource_name": "sqldb-prod-eastus",
+            "description": "Managed relational database",
             "icon": "database",
             "status": "Running",
-            "region": "us-east-1"
+            "region": "East US"
         },
         {
-            "title": "Cache Server",
-            "resource_name": "redis-cache-01",
-            "description": "Redis caching layer",
-            "icon": "zap",
+            "title": "Azure Cosmos DB",
+            "resource_name": "cosmosdb-main",
+            "description": "NoSQL distributed database",
+            "icon": "box",
             "status": "Running",
-            "region": "us-east-1"
+            "region": "East US"
         },
         {
-            "title": "Load Balancer",
-            "resource_name": "lb-prod-01",
-            "description": "Application load balancer",
-            "icon": "network",
-            "status": "Running",
-            "region": "us-east-1"
-        },
-        {
-            "title": "Storage",
-            "resource_name": "s3-bucket-main",
-            "description": "Main S3 storage bucket",
+            "title": "Azure Storage Account",
+            "resource_name": "stgacct-prod-eastus",
+            "description": "Blob, Table, Queue storage",
             "icon": "hard_drive",
             "status": "Running",
-            "region": "us-east-1"
+            "region": "East US"
         },
         {
-            "title": "API Gateway",
-            "resource_name": "api-gateway-01",
-            "description": "REST API gateway",
+            "title": "Azure Key Vault",
+            "resource_name": "keyvault-prod-eastus",
+            "description": "Secrets and certificate management",
+            "icon": "lock",
+            "status": "Running",
+            "region": "East US"
+        },
+        {
+            "title": "Azure Load Balancer",
+            "resource_name": "lb-frontend-prod",
+            "description": "Network load balancing",
+            "icon": "network",
+            "status": "Running",
+            "region": "East US"
+        },
+        {
+            "title": "Azure API Management",
+            "resource_name": "apim-prod-eastus",
+            "description": "API gateway and management",
             "icon": "link",
             "status": "Running",
-            "region": "us-east-1"
+            "region": "East US"
+        },
+        {
+            "title": "Azure Container Registry",
+            "resource_name": "acr-prod-eastus",
+            "description": "Docker container image repository",
+            "icon": "container",
+            "status": "Running",
+            "region": "East US"
+        },
+        {
+            "title": "Azure Functions",
+            "resource_name": "func-app-serverless",
+            "description": "Serverless compute functions",
+            "icon": "zap",
+            "status": "Running",
+            "region": "East US"
+        },
+        {
+            "title": "Azure Service Bus",
+            "resource_name": "servicebus-prod",
+            "description": "Message queuing and pub/sub",
+            "icon": "activity",
+            "status": "Running",
+            "region": "East US"
+        },
+        {
+            "title": "Azure Application Insights",
+            "resource_name": "appinsights-prod",
+            "description": "Application monitoring and analytics",
+            "icon": "shield",
+            "status": "Running",
+            "region": "East US"
         }
     ]
     
