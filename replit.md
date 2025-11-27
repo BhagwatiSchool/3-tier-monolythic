@@ -90,13 +90,14 @@ frontend/
 - Reset any user's password with new password
 - View all registered users with join dates
 
-🎨 **User-Specific Themes** ✅ FIXED
-- Each user has their own theme (per-user, not global!)
+🎨 **User-Specific Themes** ✅ VERIFIED & WORKING
+- Each user has their own INDEPENDENT theme (per-user, NOT global!)
 - Saved to database - persists across sessions
 - Supports light/dark mode + color scheme customization
 - When user logs out and back in, their theme is restored
 - Every user can customize independently
 - **Fixed infinite loop issue** - removed remoteConfig dependency from save effect
+- **Tested & Verified**: Admin (dark) + User2 (light) have separate themes ✓
 
 ## Key Endpoints
 
@@ -136,3 +137,18 @@ These are loaded automatically by the backend config.
 4. **Deploy** using the deployment button when ready
 
 Everything works! Start using your dashboard now! 🚀
+
+## Tested Scenarios ✅
+
+### Multi-User Theme Isolation
+- ✅ Admin user: DARK theme
+- ✅ User 2: LIGHT theme  
+- ✅ Themes persist after logout/login
+- ✅ Each user's theme doesn't affect others
+- ✅ Backend stores as `user_theme_{user_id}` per user
+
+### Theme Persistence
+- ✅ Load on user login
+- ✅ Save on user changes
+- ✅ No infinite loop (fixed useEffect dependencies)
+- ✅ Backend API: GET/PUT /api/theme/
