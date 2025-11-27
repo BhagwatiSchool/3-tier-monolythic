@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from app.db.database import get_db
-from app.schemas.user import UserResponse, UserUpdate
+from app.schemas.user import UserResponse, UserUpdate, PasswordResetRequest
 from app.models.user import User
 from app.api.deps import get_current_user, get_current_admin_user
+from app.core.security import get_password_hash
 
 router = APIRouter()
 
@@ -95,3 +96,25 @@ def get_user_by_id(
         role=user.role,
         created_at=user.created_at
     )
+
+
+@router.post("/{user_id}/reset-password", response_model=dict)
+def reset_user_password(
+    user_id: str,
+    password_reset: PasswordResetRequest,
+    current_admin: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Admin can reset any user's password"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Update password
+    user.hashed_password = get_password_hash(password_reset.new_password)
+    db.commit()
+    
+    return {"message": f"Password reset successfully for user {user.email}"}

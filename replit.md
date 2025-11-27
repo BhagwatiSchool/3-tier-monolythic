@@ -9,7 +9,13 @@ Full-stack React + Python FastAPI application fully configured for Replit.
 ### Login Credentials
 ```
 Email:    ritesh@apka.bhai
-Password: admin123
+Password: Aagebadho
+```
+
+**Test Account:**
+```
+Email:    test@app.com
+Password: test123
 ```
 
 ### Or Sign Up
@@ -71,13 +77,29 @@ frontend/
   └── vite.config.ts  # Replit-configured
 ```
 
+## Key Features
+
+✨ **Shared Resource Pool**
+- Admin creates resources that ALL users can see
+- Regular users have read-only access to admin's resources
+- Admin-only create/edit/delete operations
+
+👤 **Admin Features**
+- Manage all resources (create, update, delete)
+- View all users
+- Reset any user's password
+
 ## Key Endpoints
 
 - `POST /api/auth/login` - Login user
 - `POST /api/auth/signup` - Create account
 - `GET /api/users/me` - Get profile
-- `POST /api/resources/` - Create resource
-- `GET /api/admin/users` - List all users (admin)
+- `GET /api/resources/` - Get shared resources (all users see admin's)
+- `POST /api/resources/` - Create resource (admin only)
+- `PUT /api/resources/{id}` - Update resource (admin only)
+- `DELETE /api/resources/{id}` - Delete resource (admin only)
+- `POST /api/users/{user_id}/reset-password` - Reset user password (admin only)
+- `GET /api/users/` - List all users (admin only)
 
 ## Environment
 

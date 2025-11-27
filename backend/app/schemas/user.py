@@ -29,6 +29,10 @@ class UserUpdate(BaseModel):
     avatar_url: Optional[str] = None
 
 
+class PasswordResetRequest(BaseModel):
+    new_password: str = Field(..., min_length=6)
+
+
 class UserResponse(UserBase):
     id: str
     role: UserRole
