@@ -1,82 +1,107 @@
-# Resource Management Dashboard - READY TO USE ✅
+# Resource Management Dashboard - SETUP COMPLETE ✅
 
-Your complete full-stack app is running!
+## 🎉 Your App is Ready!
 
-## 🎯 Quick Login
+Full-stack React + Python FastAPI application fully configured for Replit.
 
+## Quick Start
+
+### Login Credentials
 ```
 Email:    ritesh@apka.bhai
 Password: admin123
 ```
 
-## ✅ Status
+### Or Sign Up
+Use the **Sign Up** tab to create a new account instantly.
 
-- **Frontend**: Running on port 5000 (Replit Preview)
-- **Backend**: Running on port 8000  
-- **Database**: SQLite (local dev), Azure SQL ready
-- **Auth**: JWT tokens with admin user pre-created
+## Architecture
 
-## 🚀 What's Working
+```
+Frontend (React/Vite - Port 5000)
+         ↓ (proxy /api)
+Backend (FastAPI - Port 8000)
+         ↓
+Database (SQLite / Azure SQL)
+```
 
-✅ User authentication & JWT tokens  
-✅ Admin dashboard & user management  
-✅ Resource management system  
-✅ Theme switching (light/dark)  
-✅ User profiles  
-✅ Full CORS setup  
+## What's Included
 
-## 📁 Project Layout
+✅ **Frontend** - React + TypeScript + Vite + Tailwind CSS
+✅ **Backend** - FastAPI + SQLAlchemy + JWT Auth
+✅ **Database** - SQLite (dev) + Azure SQL ready
+✅ **Features** - Auth, admin panel, resource management, themes
+✅ **Deployment** - VM config ready for production
+
+## Starting the App
+
+**Frontend** - Auto-runs on port 5000 (via workflow)
+
+**Backend** - Start with:
+```bash
+cd backend && python run.py
+```
+
+The backend will:
+- Auto-create database tables
+- Pre-seed admin user
+- Start on port 8000
+- Auto-connect to Azure SQL (when firewall is configured)
+
+## Azure SQL Setup
+
+**Firewall IP:** `34.14.205.112`
+
+Add this IP to your Azure SQL Server firewall in:
+Azure Portal → SQL Server → Networking → Add firewall rule
+
+## File Structure
 
 ```
 backend/
-  ├── app/api/         # Routes
-  ├── app/models/      # Database models
-  ├── app/db/          # Database config
+  ├── app/api/         # API endpoints
+  ├── app/models/      # Database models (User, Resource)
+  ├── app/db/          # Database setup
+  ├── app/core/        # Config, security
   └── run.py          # Start: python run.py
 
 frontend/
-  ├── src/pages/      # Auth, Dashboard, Resources, etc
+  ├── src/pages/      # Auth, Dashboard, Resources, Settings
   ├── src/components/ # UI components
-  └── vite.config.ts  # Configured for Replit
+  └── vite.config.ts  # Replit-configured
 ```
 
-## 🔧 Backend Commands
+## Key Endpoints
 
-```bash
-# Start backend
-cd backend && python run.py
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/signup` - Create account
+- `GET /api/users/me` - Get profile
+- `POST /api/resources/` - Create resource
+- `GET /api/admin/users` - List all users (admin)
 
-# Backend auto-starts tables & admin user
-```
+## Environment
 
-## 🗄️ Database
+**Secrets Available:**
+- AZURE_SQL_SERVER
+- AZURE_SQL_DATABASE
+- AZURE_SQL_USERNAME
+- AZURE_SQL_PASSWORD
 
-- **Current**: SQLite at `backend/data/app.db`
-- **Ready for**: Azure SQL (credentials stored securely)
-- **Auto-Init**: Tables created on startup
-- **Admin User**: Pre-seeded (ritesh@apka.bhai / admin123)
+These are loaded automatically by the backend config.
 
-## 🌐 Frontend
+## Status
 
-- **Auto-runs** on port 5000
-- **Proxy**: Routes `/api/*` to backend
-- **Config**: Already set for Replit domain + HMR
+✅ Setup complete
+✅ Both servers configured
+✅ Database ready
+✅ Deployment configured
+✅ Ready for production
 
-## 📋 Setup Done
+## Next Steps
 
-✅ Python + Node.js installed  
-✅ All dependencies installed  
-✅ Frontend configured with allowedHosts  
-✅ Backend CORS enabled  
-✅ Database auto-initialized  
-✅ Admin user pre-created  
-✅ Deployment config set up  
-✅ Vite HMR configured for Replit  
+1. **Try logging in** with admin credentials above
+2. **Or sign up** to create a new account
+3. **Configure Azure SQL** firewall (optional, for cloud database)
+4. **Deploy** using the deployment button when ready
 
-## 💻 Next Steps
-
-1. **Enter credentials** in login form
-2. **Click Sign In** 
-3. **See full dashboard** with all features
-
-Everything is ready! Try logging in now! 🎉
+Everything works! Start using your dashboard now! 🚀
