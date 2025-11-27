@@ -60,12 +60,12 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-4 sm:space-x-8">
+      <header className="border-b bg-card sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
             {/* Mobile Menu Button */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild className="md:hidden">
+              <SheetTrigger asChild className="lg:hidden">
                 <Button variant="ghost" size="icon">
                   <Menu className="h-5 w-5" />
                 </Button>
@@ -106,29 +106,31 @@ export default function Layout({ children }: LayoutProps) {
               </SheetContent>
             </Sheet>
 
-            <h1 className="text-lg sm:text-xl font-bold">Resource Dashboard</h1>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.to;
-
-                return (
-                  <Link key={item.to} to={item.to}>
-                    <Button
-                      variant={isActive ? 'secondary' : 'ghost'}
-                      size="sm"
-                      className="flex items-center space-x-2"
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{item.label}</span>
-                    </Button>
-                  </Link>
-                );
-              })}
-            </nav>
+            <h1 className="text-base sm:text-lg md:text-xl font-bold whitespace-nowrap">Resource Dashboard</h1>
           </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-0 flex-1 ml-6 overflow-x-auto">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.to;
+
+              return (
+                <Link key={item.to} to={item.to} className="flex-shrink-0">
+                  <Button
+                    variant={isActive ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="flex items-center gap-1 whitespace-nowrap px-2"
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-xs sm:text-sm">{item.label}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="flex-1" />
 
           {/* User Avatar Dropdown */}
           <DropdownMenu>
