@@ -15,8 +15,19 @@ def get_user_resources(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get all resources for the current user"""
-    resources = db.query(Resource).filter(Resource.user_id == current_user.id).all()
+    """Get all resources - admin sees their own, others see admin's resources"""
+    from app.models.user import UserRole
+    
+    if current_user.role == UserRole.admin:
+        # Admin sees their own resources
+        resources = db.query(Resource).filter(Resource.user_id == current_user.id).all()
+    else:
+        # Regular users see the admin's resources
+        admin = db.query(User).filter(User.role == UserRole.admin).first()
+        if admin:
+            resources = db.query(Resource).filter(Resource.user_id == admin.id).all()
+        else:
+            resources = []
     
     # Convert UUID to string for response
     return [
@@ -42,7 +53,16 @@ def create_resource(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Create a new resource for the current user"""
+    """Create a new resource - admin only"""
+    from app.models.user import UserRole
+    
+    # Only admin can create resources
+    if current_user.role != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admins can create resources"
+        )
+    
     resource = Resource(
         user_id=current_user.id,
         icon=resource_data.icon,
@@ -82,16 +102,22 @@ def update_resource(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Update a resource (only if owned by current user)"""
-    resource = db.query(Resource).filter(
-        Resource.id == resource_id,
-        Resource.user_id == current_user.id
-    ).first()
+    """Update a resource - admin only"""
+    from app.models.user import UserRole
+    
+    # Only admin can update resources
+    if current_user.role != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admins can update resources"
+        )
+    
+    resource = db.query(Resource).filter(Resource.id == resource_id).first()
     
     if not resource:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Resource not found or you don't have permission to update it"
+            detail="Resource not found"
         )
     
     resource.icon = resource_data.icon
@@ -131,16 +157,22 @@ def delete_resource(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Delete a resource (only if owned by current user)"""
-    resource = db.query(Resource).filter(
-        Resource.id == resource_id,
-        Resource.user_id == current_user.id
-    ).first()
+    """Delete a resource - admin only"""
+    from app.models.user import UserRole
+    
+    # Only admin can delete resources
+    if current_user.role != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admins can delete resources"
+        )
+    
+    resource = db.query(Resource).filter(Resource.id == resource_id).first()
     
     if not resource:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Resource not found or you don't have permission to delete it"
+            detail="Resource not found"
         )
     
     db.delete(resource)
