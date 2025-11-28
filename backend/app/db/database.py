@@ -41,13 +41,35 @@ def get_db():
 
 
 def ensure_columns_exist():
-    """Ensure all required columns exist in the users table"""
+    """Ensure all required columns exist in the users table with correct schema"""
     inspector = inspect(engine)
     
     # Check if users table exists
     if 'users' not in inspector.get_table_names():
         print("ℹ️  Users table doesn't exist yet - will be created by SQLAlchemy")
         return
+    
+    with engine.connect() as conn:
+        # Check if id column is correct type (should be VARCHAR for UUID, not IDENTITY)
+        try:
+            result = conn.execute(text("""
+                SELECT COLUMN_NAME, DATA_TYPE, COLUMNPROPERTY(OBJECT_ID('users'), COLUMN_NAME, 'IsIdentity') as is_identity
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'id'
+            """))
+            id_info = result.fetchone()
+            
+            if id_info and id_info[2] == 1:  # is_identity = 1
+                # Need to recreate table - it has IDENTITY but we need UUID
+                print("⚠️  Recreating users table with correct UUID schema...")
+                try:
+                    conn.execute(text("DROP TABLE IF EXISTS users"))
+                    conn.commit()
+                    print("✅ Dropped old users table")
+                except:
+                    conn.rollback()
+        except:
+            pass
     
     # Get existing columns in users table
     existing_columns = {col['name'] for col in inspector.get_columns('users')}

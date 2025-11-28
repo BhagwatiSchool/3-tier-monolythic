@@ -1,0 +1,105 @@
+(venv) ritesh@backed:~$ uvicorn app.main:app --host 0.0.0.0 --port 8000
+✅ Loading .env from: /home/ritesh/.env
+  ✅ Server: ritserver.database.windows.net
+  ✅ Database: ritserver
+  ✅ Username: ritserver
+  ✅ Password: ************
+✅ Server configured for: ritserver.database.windows.net
+✅ Using AZURE SQL: ritserver.database.windows.net
+INFO:     Started server process [25108]
+INFO:     Waiting for application startup.
+✅ Added missing column: display_name
+✅ Added missing column: bio
+✅ Added missing column: avatar_url
+ERROR:    Traceback (most recent call last):
+  File "src/pymssql/_pymssql.pyx", line 461, in pymssql._pymssql.Cursor.execute
+  File "src/pymssql/_mssql.pyx", line 1087, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src/pymssql/_mssql.pyx", line 1119, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src/pymssql/_mssql.pyx", line 1317, in pymssql._mssql.MSSQLConnection.get_result
+  File "src/pymssql/_mssql.pyx", line 1791, in pymssql._mssql.check_cancel_and_raise
+  File "src/pymssql/_mssql.pyx", line 1818, in pymssql._mssql.maybe_raise_MSSQLDatabaseException
+  File "src/pymssql/_mssql.pyx", line 1835, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (544, b"Cannot insert explicit value for identity column in table 'users' when IDENTITY_INSERT is set to OFF.DB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\n")
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+  File "src/pymssql/_pymssql.pyx", line 479, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.OperationalError: (544, b"Cannot insert explicit value for identity column in table 'users' when IDENTITY_INSERT is set to OFF.DB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\n")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ritesh/venv/lib/python3.12/site-packages/starlette/routing.py", line 677, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/home/ritesh/venv/lib/python3.12/site-packages/starlette/routing.py", line 566, in __aenter__
+    await self._router.startup()
+  File "/home/ritesh/venv/lib/python3.12/site-packages/starlette/routing.py", line 656, in startup
+    handler()
+  File "/home/ritesh/app/main.py", line 45, in startup_event
+    create_super_user(db)
+  File "/home/ritesh/app/db/super_user_seed.py", line 23, in create_super_user
+    db.commit()
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1969, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1256, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1231, in _prepare_impl
+    self.session.flush()
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4312, in flush
+    self._flush(objects)
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4447, in _flush
+    with util.safe_reraise():
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 146, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4408, in _flush
+    flush_context.execute()
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1226, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+  File "src/pymssql/_pymssql.pyx", line 479, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.OperationalError: (pymssql._pymssql.OperationalError) (544, b"Cannot insert explicit value for identity column in table 'users' when IDENTITY_INSERT is set to OFF.DB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\n")
+[SQL: INSERT INTO users (id, email, hashed_password, display_name, tagline, bio, avatar_url, role, is_protected) OUTPUT inserted.created_at VALUES (%(id)s, %(email)s, %(hashed_password)s, %(display_name)s, %(tagline)s, %(bio)s, %(avatar_url)s, %(role)s, %(is_protected)s)]
+[parameters: {'id': '8942d876-cbd6-4d47-bb06-5a0e354cffd3', 'email': 'ritesh@apka.bhai', 'hashed_password': '$2b$12$0RBymBXijFP5QuZKwGVJne/YzNcr19mVk5bLxqF4bQGtvdCLAH02K', 'display_name': 'Ritesh - Admin', 'tagline': None, 'bio': None, 'avatar_url': None, 'role': 'admin', 'is_protected': 1}]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+ERROR:    Application startup failed. Exiting.
+(venv) ritesh@backed:~$
