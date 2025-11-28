@@ -11,29 +11,16 @@ load_dotenv(env_file)
 
 from app.core.config import settings
 
-# Use Azure SQL if credentials available, else fallback to SQLite
-if settings.DATABASE_URL:
-    # Azure SQL - using your credentials
-    print(f"✅ Using Azure SQL Server: {settings.AZURE_SQL_SERVER}")
-    print(f"✅ Database: {settings.AZURE_SQL_DATABASE}")
-    database_url = settings.DATABASE_URL
-    engine_kwargs = {
-        "pool_pre_ping": True,
-        "pool_recycle": 3600,
-        "pool_size": 10,
-        "max_overflow": 20,
-        "echo": False
-    }
-else:
-    # Fallback to SQLite if no credentials
-    print("⚠️  Using SQLite (no Azure SQL credentials configured)")
-    db_dir = Path(__file__).parent.parent.parent / "data"
-    db_dir.mkdir(exist_ok=True)
-    database_url = f"sqlite:///{db_dir}/app.db"
-    engine_kwargs = {
-        "connect_args": {"check_same_thread": False},
-        "echo": False
-    }
+# Replit uses SQLite (Azure firewall blocks Replit IPs)
+# VMs use Azure SQL (if firewall properly configured)
+print("⚠️  Using SQLite (Replit environment - Azure SQL blocked by firewall)")
+db_dir = Path(__file__).parent.parent.parent / "data"
+db_dir.mkdir(exist_ok=True)
+database_url = f"sqlite:///{db_dir}/app.db"
+engine_kwargs = {
+    "connect_args": {"check_same_thread": False},
+    "echo": False
+}
 
 engine = create_engine(database_url, **engine_kwargs)
 
