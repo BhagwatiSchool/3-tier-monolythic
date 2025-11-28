@@ -1,173 +1,121 @@
-# Resource Management Dashboard - SETUP COMPLETE ✅
+# Resource Management Dashboard - Fresh Start Complete ✅
 
-## 🎉 Your App is Ready!
+## 🎯 Current Status: READY TO USE
 
-Full-stack React + Python FastAPI application fully configured for Replit.
+After fresh pull from repo, app is now fully configured with **Azure SQL Database** integration.
 
-## Quick Start
+---
 
-### Login Credentials
+## ✅ What's Working
+
+| Feature | Status |
+|---------|--------|
+| Backend running | ✅ Port 8000 |
+| Frontend running | ✅ Port 5000 |
+| Azure SQL connected | ✅ ritserver.database.windows.net |
+| Resources table | ✅ Auto-created with correct schema |
+| Admin user seeded | ✅ ritesh@apka.bhai / Aagebadho |
+| Database auto-initialization | ✅ Runs on backend startup |
+
+---
+
+## 🚀 Quick Start
+
+### Login with admin:
 ```
 Email:    ritesh@apka.bhai
 Password: Aagebadho
 ```
 
-**Test Account:**
-```
-Email:    test@app.com
-Password: test123
-```
-
 ### Or Sign Up
-Use the **Sign Up** tab to create a new account instantly.
+Click "Sign Up" tab to create new accounts instantly.
 
-## Architecture
+---
 
-```
-Frontend (React/Vite - Port 5000)
-         ↓ (proxy /api)
-Backend (FastAPI - Port 8000)
-         ↓
-Database (SQLite / Azure SQL)
-```
+## 🔧 How It Works Now
 
-## What's Included
+1. **Fresh code from repo** → Uses SQLite by default
+2. **Azure SQL credentials loaded** → Backend detects & switches to Azure SQL  
+3. **init_db() on startup** → Auto-creates/fixes resources table schema
+4. **Admin seeded** → Protected user always created
+5. **Ready to use** → Login and start managing resources
 
-✅ **Frontend** - React + TypeScript + Vite + Tailwind CSS
-✅ **Backend** - FastAPI + SQLAlchemy + JWT Auth
-✅ **Database** - SQLite (dev) + Azure SQL ready
-✅ **Features** - Auth, admin panel, resource management, themes
-✅ **Deployment** - VM config ready for production
+---
 
-## Starting the App
+## 📊 Database Schema (Auto-Created)
 
-**Frontend** - Auto-runs on port 5000 (via workflow)
-
-**Backend** - Start with:
-```bash
-cd backend && python run.py
-```
-
-The backend will:
-- Auto-create database tables
-- Pre-seed admin user
-- Start on port 8000
-- Auto-connect to Azure SQL (when firewall is configured)
-
-## Azure SQL Setup
-
-**Firewall IP:** `34.14.205.112`
-
-Add this IP to your Azure SQL Server firewall in:
-Azure Portal → SQL Server → Networking → Add firewall rule
-
-## File Structure
-
-```
-backend/
-  ├── app/api/         # API endpoints
-  ├── app/models/      # Database models (User, Resource)
-  ├── app/db/          # Database setup
-  ├── app/core/        # Config, security
-  └── run.py          # Start: python run.py
-
-frontend/
-  ├── src/pages/      # Auth, Dashboard, Resources, Settings
-  ├── src/components/ # UI components
-  └── vite.config.ts  # Replit-configured
+```sql
+resources table:
+- id (INT, auto-increment)
+- user_id (VARCHAR 36) - UUID reference
+- icon (VARCHAR 20) - Resource icon
+- title (VARCHAR 100) - Resource title
+- resource_name (VARCHAR 200) - Technical name
+- description (VARCHAR 500)
+- status (VARCHAR 20) - Running/Stopped/Pending
+- region (VARCHAR 50) - Azure region
+- created_at, updated_at (DATETIME)
 ```
 
-## Key Features
+---
 
-✨ **Shared Resource Pool**
-- Admin creates resources that ALL users can see
-- Regular users have read-only access to admin's resources
-- Admin-only create/edit/delete operations
+## 🌍 Deployment Ready
 
-👤 **Admin Features**
-- Manage all resources (create, update, delete)
-- User Password Management section in Settings
-- Reset any user's password with new password
-- View all registered users with join dates
+✅ Backend: `backend/app/main.py` with FastAPI + SQLAlchemy
+✅ Frontend: `frontend/src` with React + TypeScript + Vite
+✅ Database: Azure SQL (ritserver.database.windows.net)
+✅ Environment: Auto-loaded from secrets or .env file
+✅ VMs: Frontend (52.138.183.170), Backend (4.210.68.49:8000)
 
-🎨 **User-Specific Themes** ✅ VERIFIED & WORKING
-- Each user has their own INDEPENDENT theme (per-user, NOT global!)
-- Saved to database - persists across sessions
-- Supports light/dark mode + color scheme customization
-- When user logs out and back in, their theme is restored
-- Every user can customize independently
-- **Fixed infinite loop issue** - removed remoteConfig dependency from save effect
-- **Tested & Verified**: Admin (dark) + User2 (light) have separate themes ✓
+---
 
-## Key Endpoints
+## 🎨 Features Available
 
-- `POST /api/auth/login` - Login user
-- `POST /api/auth/signup` - Create account
-- `GET /api/users/me` - Get profile
-- `GET /api/resources/` - Get shared resources (all users see admin's)
-- `POST /api/resources/` - Create resource (admin only)
-- `PUT /api/resources/{id}` - Update resource (admin only)
-- `DELETE /api/resources/{id}` - Delete resource (admin only)
-- `POST /api/users/{user_id}/reset-password` - Reset user password (admin only)
-- `GET /api/users/` - List all users (admin only)
+- ✅ User authentication (login/signup)
+- ✅ Shared resource pool (admin creates, all users see)
+- ✅ Admin-only resource management
+- ✅ User-specific theme customization
+- ✅ Password reset (admin only)
+- ✅ Azure SQL database integration
+- ✅ Auto .env detection for VMs
 
-## Environment
+---
 
-**Secrets Available:**
-- AZURE_SQL_SERVER
-- AZURE_SQL_DATABASE
-- AZURE_SQL_USERNAME
-- AZURE_SQL_PASSWORD
+## 🛠️ What's Under the Hood
 
-These are loaded automatically by the backend config.
+**backend/app/db/database.py:**
+- Auto-detects Azure SQL credentials
+- Switches from SQLite to Azure SQL automatically
+- init_db() fixes schema on startup
+- Handles column migrations
 
-## Status
+**backend/app/main.py:**
+- Calls init_db() during app startup
+- Creates tables and admin user
+- Ready for production VMs
 
-✅ Setup complete
-✅ Both servers configured
-✅ Database ready
-✅ Deployment configured
-✅ Ready for production
+**backend/app/core/config.py:**
+- Loads .env file first (for VMs)
+- Falls back to Replit secrets
+- Supports both SQLite and Azure SQL
 
-## Next Steps
+---
 
-1. **Try logging in** with admin credentials above
-2. **Or sign up** to create a new account
-3. **Configure Azure SQL** firewall (optional, for cloud database)
-4. **Deploy** using the deployment button when ready
+## ⚡ Next Steps
 
-Everything works! Start using your dashboard now! 🚀
+1. **Try the app** - Login with credentials above
+2. **Create resources** - Admin can add/edit/delete
+3. **Test features** - Theme, users, resources
+4. **Deploy** - Use published button for production VMs
 
-## Tested Scenarios ✅
+---
 
-### Multi-User Theme Isolation
-- ✅ Admin user: DARK theme
-- ✅ User 2: LIGHT theme  
-- ✅ Themes persist after logout/login
-- ✅ Each user's theme doesn't affect others
-- ✅ Backend stores as `user_theme_{user_id}` per user
+## 📝 Notes
 
-### Theme Persistence
-- ✅ Load on user login
-- ✅ Save on user changes
-- ✅ No infinite loop (fixed useEffect dependencies)
-- ✅ Backend API: GET/PUT /api/theme/
+- Fresh code from repo is now running cleanly
+- Zero manual migrations needed
+- Schema auto-fixes on startup
+- Both SQLite (dev) and Azure SQL (prod) supported
+- Ready for production deployment
 
-### Template Resources ✅
-- ✅ Admin can import 12 Azure-specific template resources with one click
-- ✅ **Azure Templates (12):**
-  1. Azure Virtual Machine
-  2. Azure App Service
-  3. Azure SQL Database
-  4. Azure Cosmos DB
-  5. Azure Storage Account
-  6. Azure Key Vault
-  7. Azure Load Balancer
-  8. Azure API Management
-  9. Azure Container Registry
-  10. Azure Functions
-  11. Azure Service Bus
-  12. Azure Application Insights
-- ✅ Admin can still create additional custom resources
-- ✅ Button appears when no resources exist
-- ✅ Endpoint: POST /api/resources/seed/templates
+**Everything is ready! You can start using the dashboard now.** 🎉
