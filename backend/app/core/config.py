@@ -13,11 +13,22 @@ class Settings:
     """Settings class that reads from environment variables"""
     
     def __init__(self):
+        # Check if we're on Replit - if so, ignore Azure credentials and use SQLite
+        is_replit = "replit.dev" in os.getenv("REPLIT_HOSTNAME", "") or os.getenv("REPLIT_WORKSPACE", "")
+        
         # Database Configuration
-        self.AZURE_SQL_SERVER = os.getenv("AZURE_SQL_SERVER", "")
-        self.AZURE_SQL_DATABASE = os.getenv("AZURE_SQL_DATABASE", "")
-        self.AZURE_SQL_USERNAME = os.getenv("AZURE_SQL_USERNAME", "")
-        self.AZURE_SQL_PASSWORD = os.getenv("AZURE_SQL_PASSWORD", "")
+        if is_replit:
+            # Force SQLite on Replit - ignore secrets
+            self.AZURE_SQL_SERVER = ""
+            self.AZURE_SQL_DATABASE = ""
+            self.AZURE_SQL_USERNAME = ""
+            self.AZURE_SQL_PASSWORD = ""
+        else:
+            # Use Azure credentials on VMs/production
+            self.AZURE_SQL_SERVER = os.getenv("AZURE_SQL_SERVER", "")
+            self.AZURE_SQL_DATABASE = os.getenv("AZURE_SQL_DATABASE", "")
+            self.AZURE_SQL_USERNAME = os.getenv("AZURE_SQL_USERNAME", "")
+            self.AZURE_SQL_PASSWORD = os.getenv("AZURE_SQL_PASSWORD", "")
         
         # Security Configuration
         self.SECRET_KEY = os.getenv("SECRET_KEY", "development-secret-key-change-in-production")
