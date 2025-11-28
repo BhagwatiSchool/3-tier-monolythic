@@ -138,6 +138,49 @@ These are loaded automatically by the backend config.
 
 Everything works! Start using your dashboard now! 🚀
 
+## ✅ Code NOW Auto-Detects Environment!
+
+**Smart Database Selection:**
+- **On Replit:** Automatically uses SQLite ✅ (Azure firewall blocks Replit)
+- **On Your VM:** Automatically uses Azure SQL ✅ (if credentials set)
+- No manual config needed - just copy & run!
+
+**For Your Backend VM Deployment:**
+
+1. **Copy updated code from Replit to your VM:**
+   ```bash
+   # Replace your backend with the updated code
+   cp -r ~/replit-workspace/backend/* /home/ritesh/app/
+   ```
+
+2. **Set Azure SQL credentials on your VM:**
+   ```bash
+   cat > /home/ritesh/.env << 'EOF'
+   AZURE_SQL_SERVER=ritserver.database.windows.net
+   AZURE_SQL_DATABASE=your_db_name_here
+   AZURE_SQL_USERNAME=your_username_here
+   AZURE_SQL_PASSWORD=your_password_here
+   SECRET_KEY=your-secret-key-here
+   EOF
+   ```
+
+3. **Restart backend on VM:**
+   ```bash
+   pkill -f "python run.py"
+   cd /home/ritesh && python run.py &
+   sleep 3
+   ```
+
+4. **Verify it's using Azure SQL:**
+   ```bash
+   curl http://localhost:8000/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"test@test.com","password":"test"}'
+   ```
+   ✅ Should respond instantly (Azure SQL working!)
+
+---
+
 ## Azure SQL Database Connection Issue 🔧
 
 **What Happened:**
