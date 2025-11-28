@@ -36,17 +36,15 @@ def init_db():
     try:
         if "mssql" in str(database_url):
             with engine.begin() as conn:
-                # Check if resources table exists and has correct schema
+                # Fix resources table
                 check_table = text("""
                     SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES 
                     WHERE TABLE_NAME = 'resources'
                 """)
                 result = conn.execute(check_table)
-                table_exists = result.scalar() > 0
+                resources_exists = result.scalar() > 0
                 
-                need_recreate = False
-                if table_exists:
-                    # Check user_id type
+                if resources_exists:
                     check_type = text("""
                     SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
                     WHERE TABLE_NAME = 'resources' AND COLUMN_NAME = 'user_id'
@@ -54,18 +52,11 @@ def init_db():
                     result = conn.execute(check_type)
                     data_type = result.scalar()
                     if data_type not in ('varchar', 'nvarchar'):
-                        # user_id is wrong type, need to drop and recreate
-                        need_recreate = True
+                        conn.execute(text("DROP TABLE IF EXISTS resources"))
+                        resources_exists = False
                 
-                if need_recreate:
-                    # Drop existing table with wrong schema
-                    conn.execute(text("DROP TABLE IF EXISTS resources"))
-                    print("✅ Dropped resources table (wrong schema)")
-                    table_exists = False
-                
-                if not table_exists:
-                    # Create table with correct schema (without FK to avoid type mismatch)
-                    create_table = text("""
+                if not resources_exists:
+                    conn.execute(text("""
                     CREATE TABLE resources (
                         id INT PRIMARY KEY IDENTITY(1,1),
                         user_id VARCHAR(36) NOT NULL,
@@ -79,9 +70,42 @@ def init_db():
                         updated_at DATETIME DEFAULT GETUTCDATE()
                     );
                     CREATE INDEX idx_resources_user_id ON resources(user_id);
+                    """))
+                    print("✅ Created resources table")
+                
+                # Fix theme_config table
+                check_theme = text("""
+                    SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES 
+                    WHERE TABLE_NAME = 'theme_config'
+                """)
+                result = conn.execute(check_theme)
+                theme_exists = result.scalar() > 0
+                
+                if theme_exists:
+                    # Check if it has correct columns
+                    check_cols = text("""
+                    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                    WHERE TABLE_NAME = 'theme_config' AND COLUMN_NAME = 'config_key'
                     """)
-                    conn.execute(create_table)
-                    print("✅ Created resources table with correct schema")
+                    result = conn.execute(check_cols)
+                    has_config_key = result.scalar() > 0
+                    
+                    if not has_config_key:
+                        conn.execute(text("DROP TABLE IF EXISTS theme_config"))
+                        theme_exists = False
+                
+                if not theme_exists:
+                    conn.execute(text("""
+                    CREATE TABLE theme_config (
+                        id VARCHAR(36) PRIMARY KEY,
+                        config_key VARCHAR(100) UNIQUE NOT NULL,
+                        config_value VARCHAR(500) NOT NULL,
+                        created_at DATETIME DEFAULT GETUTCDATE(),
+                        updated_at DATETIME DEFAULT GETUTCDATE()
+                    );
+                    CREATE INDEX idx_theme_config_key ON theme_config(config_key);
+                    """))
+                    print("✅ Created theme_config table")
     except Exception as e:
         print(f"⚠️  Database init error: {e}")
 
