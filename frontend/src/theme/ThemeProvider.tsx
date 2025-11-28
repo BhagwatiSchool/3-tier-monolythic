@@ -19,7 +19,6 @@ type ThemeContextValue = {
   loading: boolean;
 };
 
-const KEY = 'lovable_theme';
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function useTheme() {
