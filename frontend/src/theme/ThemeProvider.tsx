@@ -58,11 +58,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [remoteConfig, setRemoteConfig] = useState<ThemeShape | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [hasLoadedTheme, setHasLoadedTheme] = useState(false);
 
   // Define saveTheme early so it's available for useEffects
   const saveTheme = async (cfg?: Partial<ThemeShape>) => {
     // merge with remote config - keep all user-specific settings
-    const payload = { ...(remoteConfig || {}), ...(cfg || {}), mode: cfg?.mode || theme };
+    const payload = { ...(remoteConfig || {}), ...(cfg || {}) };
+    if (cfg?.mode) {
+      payload.mode = cfg.mode;
+    } else if (remoteConfig?.mode) {
+      payload.mode = remoteConfig.mode;
+    } else {
+      payload.mode = theme;
+    }
+    console.log(`💾 Saving theme:`, payload);
     try {
       await api.updateTheme(payload);
       setRemoteConfig(payload);
@@ -85,7 +94,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Save theme mode change to backend (per user) - only on theme change, NOT on remoteConfig change
   useEffect(() => {
     // Skip saving during initial load - wait until theme is loaded from server
-    if (isInitialLoad || !user) return;
+    // Only save mode if we've successfully loaded a theme from backend
+    if (!hasLoadedTheme || !user || isInitialLoad) return;
     
     const saveMode = async () => {
       try {
@@ -95,7 +105,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       }
     };
     saveMode();
-  }, [theme, user]);
+  }, [theme, user, hasLoadedTheme, isInitialLoad]);
 
   // Apply CSS variables when remoteConfig changes
   useEffect(() => {
@@ -155,11 +165,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           } else {
             setTheme('light');
           }
+          
+          // Mark that we've successfully loaded a theme
+          setHasLoadedTheme(true);
         } else {
           // No saved theme - use defaults
           console.log(`ℹ️ No theme found, using defaults`);
           setRemoteConfig(null);
           setTheme('light');
+          setHasLoadedTheme(true);
         }
       } catch (err) {
         console.error('❌ Failed to load theme:', err);
@@ -167,6 +181,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         if (mounted) {
           setRemoteConfig(null);
           setTheme('light');
+          setHasLoadedTheme(true);
         }
       } finally {
         if (mounted) {
