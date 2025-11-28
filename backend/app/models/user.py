@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 import enum
+import uuid
 
 
 class UserRole(str, enum.Enum):
@@ -31,8 +32,8 @@ class User(Base):
 class ThemeConfig(Base):
     __tablename__ = "theme_config"
     
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    config_key = Column(String(100), unique=True, nullable=False)
-    config_value = Column(String(500), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=True)
+    theme_data = Column(String(1000), nullable=False)  # JSON string of theme config
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
