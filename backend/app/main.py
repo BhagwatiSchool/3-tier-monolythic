@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api import auth, users, theme, resources, admin
-from app.db.database import Base, engine
+from app.db.database import Base, engine, ensure_columns_exist
 
 app = FastAPI(
     title="Resource Management API",
@@ -31,6 +31,9 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 @app.on_event("startup")
 def startup_event():
+    # Ensure all required columns exist in existing tables
+    ensure_columns_exist()
+    
     # Create tables
     Base.metadata.create_all(bind=engine)
     

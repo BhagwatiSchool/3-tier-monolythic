@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pathlib import Path
@@ -38,3 +38,38 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def ensure_columns_exist():
+    """Ensure all required columns exist in the users table"""
+    inspector = inspect(engine)
+    
+    # Check if users table exists
+    if 'users' not in inspector.get_table_names():
+        print("ℹ️  Users table doesn't exist yet - will be created by SQLAlchemy")
+        return
+    
+    # Get existing columns in users table
+    existing_columns = {col['name'] for col in inspector.get_columns('users')}
+    
+    # Define required columns
+    required_columns = {
+        'display_name': 'NVARCHAR(100)',
+        'tagline': 'NVARCHAR(200)',
+        'bio': 'NVARCHAR(500)',
+        'avatar_url': 'NVARCHAR(500)',
+        'is_protected': 'BIT DEFAULT 0',
+    }
+    
+    # Add missing columns
+    with engine.connect() as conn:
+        for col_name, col_type in required_columns.items():
+            if col_name not in existing_columns:
+                try:
+                    alter_sql = f"ALTER TABLE users ADD {col_name} {col_type}"
+                    conn.execute(text(alter_sql))
+                    conn.commit()
+                    print(f"✅ Added missing column: {col_name}")
+                except Exception as e:
+                    print(f"⚠️  Could not add {col_name}: {e}")
+                    conn.rollback()
