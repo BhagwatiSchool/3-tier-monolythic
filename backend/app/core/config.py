@@ -3,11 +3,22 @@ from urllib.parse import quote
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load .env file if exists (for VM deployment)
-# If not found, will use environment variables (for Replit Secrets)
-# Priority: .env file > Environment Variables (override=True)
-env_path = Path(__file__).resolve().parent.parent.parent / '.env'
-load_dotenv(dotenv_path=env_path, override=True)
+# Load .env file from multiple possible locations
+# Try: current dir, backend dir, and parent dir
+possible_paths = [
+    Path.cwd() / '.env',  # Current working directory
+    Path(__file__).resolve().parent.parent.parent / '.env',  # Relative to this file
+    Path('/home/azureuser/app/.env'),  # VM default location
+    Path('/home/azureuser/.env'),  # VM home
+]
+
+for env_path in possible_paths:
+    if env_path.exists():
+        print(f"✅ Loading .env from: {env_path}")
+        load_dotenv(dotenv_path=env_path, override=True)
+        break
+else:
+    print("⚠️  No .env file found - using environment variables")
 
 class Settings:
     """Settings class that reads from environment variables"""
