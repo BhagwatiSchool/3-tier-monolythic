@@ -11,9 +11,9 @@ load_dotenv(env_file)
 
 from app.core.config import settings
 
-# Replit uses SQLite (Azure firewall blocks Replit IPs)
-# VMs use Azure SQL (if firewall properly configured)
-print("⚠️  Using SQLite (Replit environment - Azure SQL blocked by firewall)")
+# Replit: Use SQLite (Azure firewall issue)
+# VMs: Will use Azure SQL (already whitelisted)
+print("⚠️  Using SQLite for Replit (testing)")
 db_dir = Path(__file__).parent.parent.parent / "data"
 db_dir.mkdir(exist_ok=True)
 database_url = f"sqlite:///{db_dir}/app.db"
