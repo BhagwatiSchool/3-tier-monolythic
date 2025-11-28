@@ -10,13 +10,14 @@ export default defineConfig({
       '@assets': path.resolve(__dirname, '../attached_assets'),
     },
   },
-  base: '/',
   server: {
     host: '0.0.0.0',
     port: 5000,
     strictPort: true,
     allowedHosts: true,
-    hmr: false,
+    hmr: {
+      clientPort: 443,
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
@@ -29,16 +30,10 @@ export default defineConfig({
     outDir: 'dist/public',
     emptyOutDir: true,
     sourcemap: false,
-    minify: 'terser',
     rollupOptions: {
       output: {
         manualChunks: undefined,
       },
     },
-  },
-  preview: {
-    host: '0.0.0.0',
-    port: 5000,
-    strictPort: false,
   },
 });

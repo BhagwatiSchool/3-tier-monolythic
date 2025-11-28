@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum as SQLEnum
+from sqlalchemy import Column, String, DateTime, Boolean, Enum as SQLEnum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 import enum
+import uuid
 
 
 class UserRole(str, enum.Enum):
@@ -13,7 +14,7 @@ class UserRole(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
     
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     display_name = Column(String(100), nullable=True)
@@ -21,8 +22,18 @@ class User(Base):
     bio = Column(String(500), nullable=True)
     avatar_url = Column(String(500), nullable=True)
     role = Column(SQLEnum(UserRole), default=UserRole.user, nullable=False)
-    is_protected = Column(Boolean, default=False, nullable=False)
+    is_protected = Column(Boolean, default=False, nullable=False)  # Super admin protection flag
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
     resources = relationship("Resource", back_populates="user", cascade="all, delete-orphan")
+
+
+class ThemeConfig(Base):
+    __tablename__ = "theme_config"
+    
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    config_key = Column(String(100), unique=True, nullable=False)
+    config_value = Column(String(500), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

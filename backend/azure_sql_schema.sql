@@ -7,11 +7,9 @@ CREATE TABLE users (
     email NVARCHAR(255) NOT NULL UNIQUE,
     hashed_password NVARCHAR(255) NOT NULL,
     display_name NVARCHAR(100),
-    tagline NVARCHAR(200),
     bio NVARCHAR(500),
     avatar_url NVARCHAR(500),
     role NVARCHAR(20) NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'user')),
-    is_protected BIT NOT NULL DEFAULT 0,
     created_at DATETIME2 DEFAULT GETDATE(),
     INDEX IX_users_email (email)
 );

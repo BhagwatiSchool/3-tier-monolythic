@@ -4,6 +4,7 @@ from typing import Optional
 
 
 class ResourceBase(BaseModel):
+    icon: str = Field(..., max_length=50)
     title: str = Field(..., min_length=1, max_length=100)
     resource_name: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=500)

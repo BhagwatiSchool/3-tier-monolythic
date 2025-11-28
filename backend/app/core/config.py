@@ -3,50 +3,21 @@ from urllib.parse import quote
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load .env file - Auto-detect + Custom paths support
-# Priority order:
-# 1. HOME directory (works for ANY user automatically)
-# 2. Custom paths (if someone wants to change location)
-# 3. Current working directory
-# 4. Relative to this file
-
-possible_paths = [
-    Path.home() / '.env',  # Auto-detect user home (~/.env)
-    Path.cwd() / '.env',  # Current working directory
-    Path(__file__).resolve().parent.parent.parent / '.env',  # Project root
-    # Custom paths (uncomment and modify if needed):
-    # Path('/custom/path/.env'),
-    # Path('/home/ritesh/custom/.env'),
-    # Path('/home/azureuser/custom/.env'),
-]
-
-env_loaded = False
-for env_path in possible_paths:
-    if env_path.exists():
-        print(f"✅ Loading .env from: {env_path}")
-        load_dotenv(dotenv_path=env_path, override=True)
-        env_loaded = True
-        break
-
-if not env_loaded:
-    print("⚠️  No .env file found - using environment variables only")
+# Load .env file if exists (for VM deployment)
+# If not found, will use environment variables (for Replit Secrets)
+# Priority: .env file > Environment Variables (override=True)
+env_path = Path(__file__).resolve().parent.parent.parent / '.env'
+load_dotenv(dotenv_path=env_path, override=True)
 
 class Settings:
     """Settings class that reads from environment variables"""
     
     def __init__(self):
-        # Database Configuration - ALWAYS read from credentials
+        # Database Configuration
         self.AZURE_SQL_SERVER = os.getenv("AZURE_SQL_SERVER", "")
         self.AZURE_SQL_DATABASE = os.getenv("AZURE_SQL_DATABASE", "")
         self.AZURE_SQL_USERNAME = os.getenv("AZURE_SQL_USERNAME", "")
         self.AZURE_SQL_PASSWORD = os.getenv("AZURE_SQL_PASSWORD", "")
-        
-        # DEBUG: Show what was loaded
-        if self.AZURE_SQL_SERVER:
-            print(f"  ✅ Server: {self.AZURE_SQL_SERVER}")
-            print(f"  ✅ Database: {self.AZURE_SQL_DATABASE}")
-            print(f"  ✅ Username: {self.AZURE_SQL_USERNAME}")
-            print(f"  ✅ Password: {'*' * len(self.AZURE_SQL_PASSWORD) if self.AZURE_SQL_PASSWORD else 'NOT SET'}")
         
         # Security Configuration
         self.SECRET_KEY = os.getenv("SECRET_KEY", "development-secret-key-change-in-production")

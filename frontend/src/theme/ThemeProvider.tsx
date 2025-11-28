@@ -19,6 +19,7 @@ type ThemeContextValue = {
   loading: boolean;
 };
 
+const KEY = 'lovable_theme';
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export function useTheme() {
@@ -61,13 +62,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Define saveTheme early so it's available for useEffects
   const saveTheme = async (cfg?: Partial<ThemeShape>) => {
-    // Save theme to localStorage only (no backend storage needed)
+    // merge with remote config - keep all user-specific settings
     const payload = { ...(remoteConfig || {}), ...(cfg || {}), mode: cfg?.mode || theme };
     try {
-      localStorage.setItem('user_theme', JSON.stringify(payload));
+      await api.updateTheme(payload);
       setRemoteConfig(payload);
     } catch (err) {
       console.error('saveTheme failed', err);
+      throw err;
     }
   };
 
@@ -96,22 +98,34 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     saveMode();
   }, [theme, user]);
 
-  // Load theme from localStorage when user logs in
+  // load remote config when user logs in (user-specific theme)
   useEffect(() => {
     let mounted = true;
     setIsInitialLoad(true);
     
-    try {
-      const savedTheme = localStorage.getItem('user_theme');
-      if (savedTheme) {
-        const cfg = JSON.parse(savedTheme);
-        if (mounted) {
+    (async () => {
+      try {
+        // Only fetch theme if user is authenticated
+        const token = localStorage.getItem('access_token');
+        if (!token || !user) {
+          setLoading(false);
+          setIsInitialLoad(false);
+          return;
+        }
+        
+        const cfg = await api.getTheme();
+        if (!mounted) return;
+        if (cfg) {
           setRemoteConfig(cfg);
           
+          // Use user's saved theme mode
           if ((cfg as any).mode) {
             setTheme((cfg as any).mode as ThemeMode);
+          } else {
+            setTheme('light'); // default
           }
           
+          // Apply saved CSS variables if present
           if ((cfg as any).primaryColor) {
             const primaryHSL = hexToHSL((cfg as any).primaryColor);
             document.documentElement.style.setProperty('--primary', primaryHSL);
@@ -121,18 +135,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             const accentHSL = hexToHSL((cfg as any).accentColor);
             document.documentElement.style.setProperty('--accent', accentHSL);
           }
+        } else {
+          setTheme('light');
         }
-      } else {
-        if (mounted) setTheme('light');
+      } catch (err) {
+        // backend may not have theme — ignore silently
+        setTheme('light');
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          setIsInitialLoad(false);
+        }
       }
-    } catch (err) {
-      if (mounted) setTheme('light');
-    } finally {
-      if (mounted) {
-        setLoading(false);
-        setIsInitialLoad(false);
-      }
-    }
+    })();
+    return () => { mounted = false; };
   }, [user]);
 
   const setThemeMode = (m: ThemeMode) => setTheme(m);

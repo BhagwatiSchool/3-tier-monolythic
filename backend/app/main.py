@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api import auth, users, theme, resources, admin
-from app.db.database import Base, engine, init_db
+from app.db.database import Base, engine
 
 app = FastAPI(
     title="Resource Management API",
@@ -33,7 +33,6 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 def startup_event():
     # Create tables
     Base.metadata.create_all(bind=engine)
-    init_db()  # Initialize resources table with Azure SQL schema
     
     # Create super user
     from app.db.database import SessionLocal
