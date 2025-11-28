@@ -6,26 +6,8 @@ let API_BASE_URL = "";
 
 // Compute API URL at runtime
 if (typeof window !== 'undefined') {
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  
-  // 1. Check for env variable (set during build)
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) {
-    API_BASE_URL = envUrl;
-  }
-  // 2. Replit: direct to same domain on port 8000
-  else if (hostname.includes('replit.dev')) {
-    API_BASE_URL = `${protocol}//${hostname}:8000`;
-  }
-  // 3. Local development
-  else if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    API_BASE_URL = 'http://localhost:8000';
-  }
-  // 4. Production: direct to port 8000 on same hostname
-  else {
-    API_BASE_URL = `${protocol}//${hostname}:8000`;
-  }
+  // Always use relative /api path - proxy handles routing
+  API_BASE_URL = '/api';
 }
 
 const apiClient: AxiosInstance = axios.create({
