@@ -9,6 +9,160 @@ from app.api.deps import get_current_user
 
 router = APIRouter()
 
+# Template resources - Azure specific
+TEMPLATE_RESOURCES = [
+    {
+        "title": "Azure Virtual Machine",
+        "resource_name": "vm-prod-eastus-01",
+        "description": "Windows/Linux VM for compute workloads",
+        "icon": "server",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure App Service",
+        "resource_name": "app-service-api-prod",
+        "description": "Managed web app hosting",
+        "icon": "globe",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure SQL Database",
+        "resource_name": "sqldb-prod-eastus",
+        "description": "Managed relational database",
+        "icon": "database",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Cosmos DB",
+        "resource_name": "cosmosdb-main",
+        "description": "NoSQL distributed database",
+        "icon": "box",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Storage Account",
+        "resource_name": "stgacct-prod-eastus",
+        "description": "Blob, Table, Queue storage",
+        "icon": "hard_drive",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Key Vault",
+        "resource_name": "keyvault-prod-eastus",
+        "description": "Secrets and certificate management",
+        "icon": "lock",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Load Balancer",
+        "resource_name": "lb-frontend-prod",
+        "description": "Network load balancing",
+        "icon": "network",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure API Management",
+        "resource_name": "apim-prod-eastus",
+        "description": "API gateway and management",
+        "icon": "link",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Container Registry",
+        "resource_name": "acr-prod-eastus",
+        "description": "Docker container image repository",
+        "icon": "container",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Functions",
+        "resource_name": "func-app-serverless",
+        "description": "Serverless compute functions",
+        "icon": "zap",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Service Bus",
+        "resource_name": "servicebus-prod",
+        "description": "Message queuing and pub/sub",
+        "icon": "activity",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Application Insights",
+        "resource_name": "appinsights-prod",
+        "description": "Application monitoring and analytics",
+        "icon": "shield",
+        "status": "Running",
+        "region": "East US"
+    }
+]
+
+
+@router.get("/templates")
+def get_templates():
+    """Get list of available template resources"""
+    return [{"id": i, **t} for i, t in enumerate(TEMPLATE_RESOURCES)]
+
+
+@router.post("/import-templates", response_model=List[ResourceResponse], status_code=status.HTTP_201_CREATED)
+def import_selected_templates(
+    template_ids: List[int],
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Import selected template resources - admin only"""
+    from app.models.user import UserRole
+    
+    if current_user.role != UserRole.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admins can import resources"
+        )
+    
+    created_resources = []
+    for template_id in template_ids:
+        if 0 <= template_id < len(TEMPLATE_RESOURCES):
+            template = TEMPLATE_RESOURCES[template_id]
+            resource = Resource(
+                user_id=current_user.id,
+                title=template["title"],
+                resource_name=template["resource_name"],
+                description=template["description"],
+                icon=template["icon"],
+                status=template["status"],
+                region=template["region"]
+            )
+            db.add(resource)
+            db.flush()
+            
+            created_resources.append(ResourceResponse(
+                id=resource.id,
+                user_id=str(resource.user_id),
+                icon=resource.icon,
+                title=resource.title,
+                resource_name=resource.resource_name,
+                description=resource.description,
+                status=resource.status,
+                region=resource.region,
+                created_at=resource.created_at,
+                updated_at=resource.updated_at
+            ))
+    
+    db.commit()
+    return created_resources
+
 
 @router.get("/", response_model=List[ResourceResponse])
 def get_user_resources(

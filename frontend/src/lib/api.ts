@@ -167,6 +167,16 @@ export const api = {
     return unwrap(res);
   },
 
+  getTemplates: async () => {
+    const res = await apiClient.get('/api/resources/templates');
+    return unwrap(res);
+  },
+
+  importTemplates: async (templateIds: number[]) => {
+    const res = await apiClient.post('/api/resources/import-templates', templateIds);
+    return unwrap(res);
+  },
+
   createResource: async (data: any) => {
     const res = await apiClient.post('/api/resources/', data);
     return unwrap(res);
