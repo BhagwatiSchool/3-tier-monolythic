@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/theme/ThemeProvider';
 import { useToast } from '@/hooks/use-toast';
@@ -61,10 +61,25 @@ const colorSchemes: ColorScheme[] = [
 
 export default function ThemeSettings() {
   const navigate = useNavigate();
-  const { theme, setThemeMode, saveTheme } = useTheme();
+  const { theme, setThemeMode, remoteConfig, saveTheme } = useTheme();
   const { toast } = useToast();
   const [selectedScheme, setSelectedScheme] = useState<string>('ocean-blue');
   const [applying, setApplying] = useState(false);
+
+  // Load saved theme scheme on component mount
+  useEffect(() => {
+    if (remoteConfig?.schemeId) {
+      setSelectedScheme(remoteConfig.schemeId as string);
+    } else if (remoteConfig?.primaryColor) {
+      // Find matching scheme by color
+      const matchingScheme = colorSchemes.find(
+        scheme => scheme.primaryColor.toLowerCase() === (remoteConfig.primaryColor as string).toLowerCase()
+      );
+      if (matchingScheme) {
+        setSelectedScheme(matchingScheme.id);
+      }
+    }
+  }, [remoteConfig]);
 
   // Helper function to convert HEX to HSL format for Shadcn
   const hexToHSL = (hex: string): string => {
