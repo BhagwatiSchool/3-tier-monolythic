@@ -5,6 +5,7 @@ import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   ArrowLeft, 
   Server, 
@@ -26,7 +27,9 @@ import {
   Boxes,
   Container,
   Folder,
-  Lock
+  Lock,
+  Plus,
+  Check
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -39,6 +42,16 @@ interface Resource {
   status: string;
   region: string;
   created_at: string;
+}
+
+interface Template {
+  id: number;
+  title: string;
+  resource_name: string;
+  description: string;
+  icon: string;
+  status: string;
+  region: string;
 }
 
 // Icon mapping
@@ -68,7 +81,9 @@ export default function Resources() {
   const queryClient = useQueryClient();
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSeeding, setIsSeeding] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [selectedTemplates, setSelectedTemplates] = useState<Set<number>>(new Set());
+  const [isImporting, setIsImporting] = useState(false);
 
   // Fetch resources from API
   const { data: resources = [], isLoading } = useQuery<Resource[]>({
@@ -79,20 +94,43 @@ export default function Resources() {
     },
   });
 
+  // Fetch templates
+  const { data: templates = [] } = useQuery<Template[]>({
+    queryKey: ['templates'],
+    queryFn: async (): Promise<Template[]> => {
+      const response = await api.getTemplates();
+      return (Array.isArray(response) ? response : []) as Template[];
+    },
+    enabled: showTemplateSelector,
+  });
+
   const handleResourceClick = (resource: Resource) => {
     setSelectedResource(resource);
     setIsModalOpen(true);
   };
 
-  const handleSeedTemplates = async () => {
+  const handleTemplateToggle = (templateId: number) => {
+    const newSelected = new Set(selectedTemplates);
+    if (newSelected.has(templateId)) {
+      newSelected.delete(templateId);
+    } else {
+      newSelected.add(templateId);
+    }
+    setSelectedTemplates(newSelected);
+  };
+
+  const handleImportSelected = async () => {
     try {
-      setIsSeeding(true);
-      await api.seedTemplateResources();
+      setIsImporting(true);
+      const templateIds = Array.from(selectedTemplates);
+      await api.importTemplates(templateIds);
       queryClient.invalidateQueries({ queryKey: ['resources'] });
+      setShowTemplateSelector(false);
+      setSelectedTemplates(new Set());
     } catch (error) {
-      console.error('Failed to seed templates:', error);
+      console.error('Failed to import templates:', error);
     } finally {
-      setIsSeeding(false);
+      setIsImporting(false);
     }
   };
 
@@ -143,59 +181,224 @@ export default function Resources() {
         </div>
 
         {resources.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground mb-4">
-                No resources found.
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Button onClick={handleSeedTemplates} disabled={isSeeding} className="bg-blue-600 hover:bg-blue-700">
-                  {isSeeding ? 'Adding...' : 'Add Template Resources'}
-                </Button>
-                <Button onClick={() => navigate('/settings')} variant="outline">
-                  Go to Settings
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {resources.map((resource) => {
-              const IconComponent = getIconComponent(resource.icon);
-              return (
-                <Card
-                  key={resource.id}
-                  className="cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-100 dark:border-blue-900/50"
-                  onClick={() => handleResourceClick(resource)}
+          <div className="space-y-6">
+            <Card>
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground mb-6">
+                  No resources found. Select Azure templates below to get started.
+                </p>
+                <Button 
+                  onClick={() => setShowTemplateSelector(true)} 
+                  className="bg-blue-600 hover:bg-blue-700 gap-2"
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 shadow-lg">
-                        <IconComponent className="h-5 w-5 text-white" strokeWidth={2.5} />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                          {resource.title}
-                        </CardTitle>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-2 truncate">
-                      {resource.resource_name}
-                    </h3>
-                    <CardDescription className="mb-4 line-clamp-2 text-sm">
-                      {resource.description}
-                    </CardDescription>
-                    <p className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
-                      Click to view details 
-                      <span className="text-base">→</span>
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                  <Plus className="h-4 w-4" />
+                  Add Template Resources
+                </Button>
+              </CardContent>
+            </Card>
+
+            {showTemplateSelector && (
+              <Card className="border-blue-200 dark:border-blue-900 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20">
+                <CardHeader>
+                  <CardTitle className="text-lg">Available Azure Services</CardTitle>
+                  <CardDescription>
+                    Click to select templates you want to add ({selectedTemplates.size} selected)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    {templates.map((template) => {
+                      const IconComponent = getIconComponent(template.icon);
+                      const isSelected = selectedTemplates.has(template.id);
+                      
+                      return (
+                        <div
+                          key={template.id}
+                          onClick={() => handleTemplateToggle(template.id)}
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                            isSelected
+                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-500'
+                              : 'border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-600 bg-white dark:bg-slate-900/50'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`p-2 rounded-lg mt-1 ${
+                              isSelected 
+                                ? 'bg-blue-600' 
+                                : 'bg-gray-100 dark:bg-gray-800'
+                            }`}>
+                              <IconComponent className={`h-5 w-5 ${
+                                isSelected 
+                                  ? 'text-white' 
+                                  : 'text-gray-600 dark:text-gray-400'
+                              }`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm text-foreground truncate">
+                                {template.title}
+                              </h3>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {template.description}
+                              </p>
+                            </div>
+                            {isSelected && (
+                              <Check className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex gap-3 pt-4 border-t">
+                    <Button
+                      onClick={handleImportSelected}
+                      disabled={selectedTemplates.size === 0 || isImporting}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      {isImporting ? 'Adding...' : `Add ${selectedTemplates.size} Template(s)`}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowTemplateSelector(false);
+                        setSelectedTemplates(new Set());
+                      }}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
+        ) : (
+          <>
+            <div className="mb-6 flex gap-3">
+              <Button 
+                onClick={() => setShowTemplateSelector(!showTemplateSelector)} 
+                className="bg-blue-600 hover:bg-blue-700 gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add More Templates
+              </Button>
+            </div>
+
+            {showTemplateSelector && (
+              <Card className="mb-6 border-blue-200 dark:border-blue-900 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20">
+                <CardHeader>
+                  <CardTitle className="text-lg">Available Azure Services</CardTitle>
+                  <CardDescription>
+                    Click to select templates you want to add ({selectedTemplates.size} selected)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    {templates.map((template) => {
+                      const IconComponent = getIconComponent(template.icon);
+                      const isSelected = selectedTemplates.has(template.id);
+                      
+                      return (
+                        <div
+                          key={template.id}
+                          onClick={() => handleTemplateToggle(template.id)}
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                            isSelected
+                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-500'
+                              : 'border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-600 bg-white dark:bg-slate-900/50'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`p-2 rounded-lg mt-1 ${
+                              isSelected 
+                                ? 'bg-blue-600' 
+                                : 'bg-gray-100 dark:bg-gray-800'
+                            }`}>
+                              <IconComponent className={`h-5 w-5 ${
+                                isSelected 
+                                  ? 'text-white' 
+                                  : 'text-gray-600 dark:text-gray-400'
+                              }`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm text-foreground truncate">
+                                {template.title}
+                              </h3>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {template.description}
+                              </p>
+                            </div>
+                            {isSelected && (
+                              <Check className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex gap-3 pt-4 border-t">
+                    <Button
+                      onClick={handleImportSelected}
+                      disabled={selectedTemplates.size === 0 || isImporting}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      {isImporting ? 'Adding...' : `Add ${selectedTemplates.size} Template(s)`}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowTemplateSelector(false);
+                        setSelectedTemplates(new Set());
+                      }}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {resources.map((resource) => {
+                const IconComponent = getIconComponent(resource.icon);
+                return (
+                  <Card
+                    key={resource.id}
+                    className="cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-100 dark:border-blue-900/50"
+                    onClick={() => handleResourceClick(resource)}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 shadow-lg">
+                          <IconComponent className="h-5 w-5 text-white" strokeWidth={2.5} />
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                            {resource.title}
+                          </CardTitle>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-2 truncate">
+                        {resource.resource_name}
+                      </h3>
+                      <CardDescription className="mb-4 line-clamp-2 text-sm">
+                        {resource.description}
+                      </CardDescription>
+                      <p className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
+                        Click to view details 
+                        <span className="text-base">→</span>
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </>
         )}
 
         {/* Resource Detail Modal */}
