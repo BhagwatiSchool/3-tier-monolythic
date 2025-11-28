@@ -9,15 +9,22 @@ if (typeof window !== 'undefined') {
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
   
-  if (hostname.includes('replit.dev')) {
-    // Replit: direct connection to backend on port 8000
+  // 1. Check for env variable (set during build)
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) {
+    API_BASE_URL = envUrl;
+  }
+  // 2. Replit: direct to same domain on port 8000
+  else if (hostname.includes('replit.dev')) {
     API_BASE_URL = `${protocol}//${hostname}:8000`;
-  } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    // Local development
+  }
+  // 3. Local development
+  else if (hostname === 'localhost' || hostname === '127.0.0.1') {
     API_BASE_URL = 'http://localhost:8000';
-  } else {
-    // Production VMs: nginx proxies /api/ to backend
-    API_BASE_URL = '/api';
+  }
+  // 4. Production: direct to port 8000 on same hostname
+  else {
+    API_BASE_URL = `${protocol}//${hostname}:8000`;
   }
 }
 
