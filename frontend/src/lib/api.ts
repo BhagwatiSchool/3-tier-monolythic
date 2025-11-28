@@ -37,9 +37,15 @@ apiClient.interceptors.response.use(
   (res) => res,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
-      window.location.href = '/auth';
+      // Don't auto-redirect on login/signup errors - let the component handle it
+      const isAuthEndpoint = error.config?.url?.includes('/api/auth/login') || 
+                             error.config?.url?.includes('/api/auth/signup');
+      
+      if (!isAuthEndpoint) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+        window.location.href = '/auth';
+      }
     }
     return Promise.reject(error);
   }
