@@ -4,21 +4,24 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # Load .env file from multiple possible locations
-# Try: current dir, backend dir, and parent dir
 possible_paths = [
     Path.cwd() / '.env',  # Current working directory
     Path(__file__).resolve().parent.parent.parent / '.env',  # Relative to this file
-    Path('/home/azureuser/app/.env'),  # VM default location
-    Path('/home/azureuser/.env'),  # VM home
+    Path.home() / '.env',  # Home directory (~/.env)
+    Path('/home/ritesh/app/.env'),  # VM ritesh user
+    Path('/home/azureuser/app/.env'),  # VM azureuser
 ]
 
+env_loaded = False
 for env_path in possible_paths:
     if env_path.exists():
         print(f"✅ Loading .env from: {env_path}")
         load_dotenv(dotenv_path=env_path, override=True)
+        env_loaded = True
         break
-else:
-    print("⚠️  No .env file found - using environment variables")
+
+if not env_loaded:
+    print("⚠️  No .env file found - using environment variables only")
 
 class Settings:
     """Settings class that reads from environment variables"""
