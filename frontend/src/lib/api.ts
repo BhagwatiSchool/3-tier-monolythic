@@ -45,7 +45,7 @@ export const api = {
   // Auth
   login: async (email: string, password: string): Promise<LoginResponse> => {
     const body = { email, username: email, password };
-    const res = await apiClient.post('/api/auth/login', body);
+    const res = await apiClient.post('/auth/login', body);
     return unwrap<LoginResponse>(res);
   },
 
@@ -57,13 +57,13 @@ export const api = {
       password,
     };
     if (displayName) payload.display_name = displayName;
-    const res = await apiClient.post('/api/auth/signup', payload);
+    const res = await apiClient.post('/auth/signup', payload);
     return unwrap<RegisterResponse>(res);
   },
 
   logout: async () => {
     try {
-      await apiClient.post('/api/auth/logout');
+      await apiClient.post('/auth/logout');
     } finally {
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
@@ -72,7 +72,7 @@ export const api = {
 
   // Profile
   getProfile: async (): Promise<ProfileResponse> => {
-    const res = await apiClient.get('/api/users/me');
+    const res = await apiClient.get('/users/me');
     return unwrap<ProfileResponse>(res);
   },
 
@@ -87,20 +87,20 @@ export const api = {
       payload.avatar_url = payload.avatarUrl;
       delete payload.avatarUrl;
     }
-    const res = await apiClient.patch('/api/users/me', payload);
+    const res = await apiClient.patch('/users/me', payload);
     return unwrap(res);
   },
 
   // Update user profile with tagline
   updateUserProfile: async (data: { display_name?: string; tagline?: string; bio?: string }) => {
-    const res = await apiClient.patch('/api/users/me', data);
+    const res = await apiClient.patch('/users/me', data);
     return unwrap(res);
   },
 
   uploadAvatar: async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await apiClient.post('/api/users/me/avatar', formData, {
+    const res = await apiClient.post('/users/me/avatar', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return unwrap(res);
@@ -108,12 +108,12 @@ export const api = {
 
   // Users Management (Admin only)
   getUsers: async (): Promise<any[]> => {
-    const res = await apiClient.get('/api/users/');
+    const res = await apiClient.get('/users/');
     return unwrap<any[]>(res);
   },
 
   resetUserPassword: async (userId: string, newPassword: string) => {
-    const res = await apiClient.post(`/api/users/${userId}/reset-password`, {
+    const res = await apiClient.post(`/users/${userId}/reset-password`, {
       new_password: newPassword
     });
     return unwrap(res);
@@ -121,56 +121,56 @@ export const api = {
 
   // Theme - now returns user-specific theme object directly
   getTheme: async (): Promise<any> => {
-    const res = await apiClient.get('/api/theme/');
+    const res = await apiClient.get('/theme/');
     // Backend now returns raw theme object (not wrapped in config_value)
     return unwrap(res);
   },
 
   updateTheme: async (theme: any) => {
     // Backend accepts raw theme object and saves per-user
-    const res = await apiClient.put('/api/theme/', theme);
+    const res = await apiClient.put('/theme/', theme);
     return unwrap(res);
   },
 
   // Admin - User Management
   getAllUsers: async () => {
-    const res = await apiClient.get('/api/admin/users');
+    const res = await apiClient.get('/admin/users');
     return unwrap<any[]>(res);
   },
 
   updateUserRole: async (userId: string, role: string) => {
-    const res = await apiClient.patch(`/api/admin/users/${userId}/role`, { role });
+    const res = await apiClient.patch(`/admin/users/${userId}/role`, { role });
     return unwrap(res);
   },
 
   deleteUser: async (userId: string) => {
-    const res = await apiClient.delete(`/api/admin/users/${userId}`);
+    const res = await apiClient.delete(`/admin/users/${userId}`);
     return unwrap(res);
   },
 
   // Resources / stats
   getResources: async () => {
-    const res = await apiClient.get('/api/resources/');
+    const res = await apiClient.get('/resources/');
     return unwrap(res);
   },
 
   seedTemplateResources: async () => {
-    const res = await apiClient.post('/api/resources/seed/templates');
+    const res = await apiClient.post('/resources/seed/templates');
     return unwrap(res);
   },
 
   createResource: async (data: any) => {
-    const res = await apiClient.post('/api/resources/', data);
+    const res = await apiClient.post('/resources/', data);
     return unwrap(res);
   },
 
   updateResource: async (id: number, data: any) => {
-    const res = await apiClient.put(`/api/resources/${id}`, data);
+    const res = await apiClient.put(`/resources/${id}`, data);
     return unwrap(res);
   },
 
   deleteResource: async (id: number) => {
-    const res = await apiClient.delete(`/api/resources/${id}`);
+    const res = await apiClient.delete(`/resources/${id}`);
     return unwrap(res);
   },
 };
