@@ -11,8 +11,9 @@ load_dotenv(env_file)
 
 from app.core.config import settings
 
-# Use SQLite for local development
-print("⚠️  Using SQLite for local development")
+# Always use SQLite for now (Azure SQL connectivity issues need firewall setup)
+# TODO: Configure Azure SQL firewall rules to allow Replit IPs
+print("⚠️  Using SQLite for development/production")
 db_dir = Path(__file__).parent.parent.parent / "data"
 db_dir.mkdir(exist_ok=True)
 database_url = f"sqlite:///{db_dir}/app.db"

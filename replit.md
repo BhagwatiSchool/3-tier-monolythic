@@ -138,6 +138,37 @@ These are loaded automatically by the backend config.
 
 Everything works! Start using your dashboard now! 🚀
 
+## Azure SQL Database Connection Issue 🔧
+
+**What Happened:**
+- Backend tried to connect to your Azure SQL Server
+- Connection FAILED: "Unable to connect - Adaptive Server is unavailable"
+- **Root Cause:** Azure SQL Server has IP firewall restrictions
+- Replit's IP addresses are NOT whitelisted in your Azure SQL firewall
+
+**Current Status:**
+- ✅ App working with SQLite (temporary)
+- ⚠️ Azure SQL not connected (needs firewall config)
+
+**To Fix Azure SQL Connection:**
+
+1. **Go to Azure Portal** → Your SQL Server resource
+2. **Set Firewall Rules** → Add these:
+   - Allow: 0.0.0.0 to 255.255.255.255 (allow all IPs)
+   - OR: Find your Replit IP and whitelist that
+3. **Run this in Replit terminal to find your IP:**
+   ```bash
+   curl -s https://api.ipify.org
+   ```
+4. **Update database.py** to use Azure (I'll switch it back once firewall is ready)
+
+**OR Use Connection String with Azure Entra (recommended):**
+- Use connection pooling proxy
+- Use SQL Server managed identity
+- Configure connection string for Replit environment
+
+**For Now:** App uses SQLite - works perfectly for development. When you fix firewall, let me know and I'll switch back to Azure SQL!
+
 ## Tested Scenarios ✅
 
 ### Multi-User Theme Isolation
