@@ -27,7 +27,7 @@ class Resource(Base):
     __tablename__ = "resources"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     icon = Column(String(20), nullable=False)
     title = Column(String(100), nullable=False)
     resource_name = Column(String(200), nullable=False)

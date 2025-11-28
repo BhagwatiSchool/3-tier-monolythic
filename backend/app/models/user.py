@@ -1,9 +1,8 @@
-from sqlalchemy import Column, String, DateTime, Boolean, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum as SQLEnum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 import enum
-import uuid
 
 
 class UserRole(str, enum.Enum):
@@ -14,7 +13,7 @@ class UserRole(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
     
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     display_name = Column(String(100), nullable=True)
@@ -22,7 +21,7 @@ class User(Base):
     bio = Column(String(500), nullable=True)
     avatar_url = Column(String(500), nullable=True)
     role = Column(SQLEnum(UserRole), default=UserRole.user, nullable=False)
-    is_protected = Column(Boolean, default=False, nullable=False)  # Super admin protection flag
+    is_protected = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
