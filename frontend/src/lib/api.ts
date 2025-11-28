@@ -6,18 +6,23 @@ let API_BASE_URL = "";
 
 // Compute API URL at runtime
 if (typeof window !== 'undefined') {
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  
-  if (hostname.includes('replit.dev')) {
-    // Replit: use same domain, port 8000, same protocol
-    API_BASE_URL = `${protocol}//${hostname}:8000`;
-  } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    // Local development
-    API_BASE_URL = 'http://localhost:8000';
+  // First check environment variable (for separate VMs)
+  if (import.meta.env.VITE_API_URL) {
+    API_BASE_URL = import.meta.env.VITE_API_URL;
   } else {
-    // Custom deployment (VM, custom IP, etc)
-    API_BASE_URL = `${protocol}//${hostname}:8000`;
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    if (hostname.includes('replit.dev')) {
+      // Replit: use same domain, port 8000, same protocol
+      API_BASE_URL = `${protocol}//${hostname}:8000`;
+    } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Local development
+      API_BASE_URL = 'http://localhost:8000';
+    } else {
+      // Custom deployment (VM, custom IP, etc)
+      API_BASE_URL = `${protocol}//${hostname}:8000`;
+    }
   }
 }
 
