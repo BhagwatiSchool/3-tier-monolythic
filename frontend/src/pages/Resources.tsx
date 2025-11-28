@@ -85,6 +85,15 @@ export default function Resources() {
   const [selectedTemplates, setSelectedTemplates] = useState<Set<number>>(new Set());
   const [isImporting, setIsImporting] = useState(false);
 
+  // Fetch current user
+  const { data: currentUser } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      const response = await api.getProfile();
+      return response;
+    },
+  });
+
   // Fetch resources from API
   const { data: resources = [], isLoading } = useQuery<Resource[]>({
     queryKey: ['resources'],
@@ -93,6 +102,8 @@ export default function Resources() {
       return (Array.isArray(response) ? response : []) as Resource[];
     },
   });
+
+  const isAdmin = currentUser?.role === 'admin';
 
   // Fetch templates
   const { data: templates = [] } = useQuery<Template[]>({
@@ -185,15 +196,17 @@ export default function Resources() {
             <Card>
               <CardContent className="py-12 text-center">
                 <p className="text-muted-foreground mb-6">
-                  No resources found. Select Azure templates below to get started.
+                  No resources found. {isAdmin && 'Select Azure templates below to get started.'}
                 </p>
-                <Button 
-                  onClick={() => setShowTemplateSelector(true)} 
-                  className="bg-blue-600 hover:bg-blue-700 gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Template Resources
-                </Button>
+                {isAdmin && (
+                  <Button 
+                    onClick={() => setShowTemplateSelector(true)} 
+                    className="bg-blue-600 hover:bg-blue-700 gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Template Resources
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
@@ -275,15 +288,17 @@ export default function Resources() {
           </div>
         ) : (
           <>
-            <div className="mb-6 flex gap-3">
-              <Button 
-                onClick={() => setShowTemplateSelector(!showTemplateSelector)} 
-                className="bg-blue-600 hover:bg-blue-700 gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Add More Templates
-              </Button>
-            </div>
+            {isAdmin && (
+              <div className="mb-6 flex gap-3">
+                <Button 
+                  onClick={() => setShowTemplateSelector(!showTemplateSelector)} 
+                  className="bg-blue-600 hover:bg-blue-700 gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add More Templates
+                </Button>
+              </div>
+            )}
 
             {showTemplateSelector && (
               <Card className="mb-6 border-blue-200 dark:border-blue-900 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20">
