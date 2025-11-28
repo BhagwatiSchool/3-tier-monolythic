@@ -11,33 +11,20 @@ load_dotenv(env_file)
 
 from app.core.config import settings
 
-# Determine database to use
-database_url = None
-engine_kwargs = {}
+# ONLY use Azure SQL - No SQLite fallback!
+if not settings.DATABASE_URL:
+    raise RuntimeError(
+        "❌ FATAL: Azure SQL credentials not configured!\n\n"
+        "Set these environment variables:\n"
+        "  AZURE_SQL_SERVER=your-server.database.windows.net\n"
+        "  AZURE_SQL_DATABASE=your-database-name\n"
+        "  AZURE_SQL_USERNAME=your-admin-username\n"
+        "  AZURE_SQL_PASSWORD=your-secure-password"
+    )
 
-# Try Azure SQL first if credentials are configured
-if settings.DATABASE_URL:
-    try:
-        # Test connection to Azure SQL
-        test_engine = create_engine(settings.DATABASE_URL, **{"echo": False, "pool_pre_ping": True})
-        test_engine.connect().close()
-        database_url = settings.DATABASE_URL
-        engine_kwargs = {"echo": False}
-        print(f"✅ Using AZURE SQL: {settings.AZURE_SQL_SERVER}")
-    except Exception as e:
-        print(f"⚠️  Azure SQL unavailable: {str(e)[:50]}...")
-        database_url = None
-
-# Fallback to SQLite if Azure not available
-if not database_url:
-    print("Using SQLite (local development/Replit)")
-    db_dir = Path(__file__).parent.parent.parent / "data"
-    db_dir.mkdir(exist_ok=True)
-    database_url = f"sqlite:///{db_dir}/app.db"
-    engine_kwargs = {
-        "connect_args": {"check_same_thread": False},
-        "echo": False
-    }
+print(f"✅ Using AZURE SQL: {settings.AZURE_SQL_SERVER}")
+database_url = settings.DATABASE_URL
+engine_kwargs = {"echo": False}
 
 engine = create_engine(database_url, **engine_kwargs)
 
