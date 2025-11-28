@@ -4,10 +4,23 @@ from app.core.security import get_password_hash
 
 
 def create_super_user(db: Session) -> None:
-    """Create main admin user (protected) if it doesn't exist"""
+    """Create main admin user (protected) - only one admin allowed"""
     admin_email = "ritesh@apka.bhai"
     
-    # Check if admin user already exists
+    # Delete all other admin users (keep only ritesh@apka.bhai)
+    other_admins = db.query(User).filter(
+        User.role == UserRole.admin,
+        User.email != admin_email
+    ).all()
+    
+    for admin in other_admins:
+        db.delete(admin)
+        print(f"🗑️  Removed duplicate admin: {admin.email}")
+    
+    if other_admins:
+        db.commit()
+    
+    # Check if main admin user already exists
     existing_user = db.query(User).filter(User.email == admin_email).first()
     
     if not existing_user:
