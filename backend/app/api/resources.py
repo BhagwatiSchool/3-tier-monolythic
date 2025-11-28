@@ -29,12 +29,11 @@ def get_user_resources(
         else:
             resources = []
     
-    # Convert UUID to string for response
+    # Convert to response model
     return [
         ResourceResponse(
             id=r.id,
             user_id=str(r.user_id),
-            icon=r.icon,
             title=r.title,
             resource_name=r.resource_name,
             description=r.description,
@@ -65,7 +64,6 @@ def create_resource(
     
     resource = Resource(
         user_id=current_user.id,
-        icon=resource_data.icon,
         title=resource_data.title,
         resource_name=resource_data.resource_name,
         description=resource_data.description,
@@ -80,11 +78,10 @@ def create_resource(
     db.commit()
     db.refresh(resource)
     
-    # Convert UUID to string for response
+    # Convert to response model
     return ResourceResponse(
         id=resource.id,
         user_id=str(resource.user_id),
-        icon=resource.icon,
         title=resource.title,
         resource_name=resource.resource_name,
         description=resource.description,
@@ -120,7 +117,6 @@ def update_resource(
             detail="Resource not found"
         )
     
-    resource.icon = resource_data.icon
     resource.title = resource_data.title
     resource.resource_name = resource_data.resource_name
     resource.description = resource_data.description
@@ -134,11 +130,10 @@ def update_resource(
     db.commit()
     db.refresh(resource)
     
-    # Convert UUID to string for response
+    # Convert to response model
     return ResourceResponse(
         id=resource.id,
         user_id=str(resource.user_id),
-        icon=resource.icon,
         title=resource.title,
         resource_name=resource.resource_name,
         description=resource.description,
@@ -165,13 +160,12 @@ def seed_template_resources(
             detail="Only admins can seed resources"
         )
     
-    # Template resources - Azure specific
+    # Template resources - Azure specific (12 resources)
     templates = [
         {
             "title": "Azure Virtual Machine",
             "resource_name": "vm-prod-eastus-01",
             "description": "Windows/Linux VM for compute workloads",
-            "icon": "server",
             "status": "Running",
             "region": "East US"
         },
@@ -179,7 +173,6 @@ def seed_template_resources(
             "title": "Azure App Service",
             "resource_name": "app-service-api-prod",
             "description": "Managed web app hosting",
-            "icon": "globe",
             "status": "Running",
             "region": "East US"
         },
@@ -187,7 +180,6 @@ def seed_template_resources(
             "title": "Azure SQL Database",
             "resource_name": "sqldb-prod-eastus",
             "description": "Managed relational database",
-            "icon": "database",
             "status": "Running",
             "region": "East US"
         },
@@ -195,7 +187,6 @@ def seed_template_resources(
             "title": "Azure Cosmos DB",
             "resource_name": "cosmosdb-main",
             "description": "NoSQL distributed database",
-            "icon": "box",
             "status": "Running",
             "region": "East US"
         },
@@ -203,7 +194,6 @@ def seed_template_resources(
             "title": "Azure Storage Account",
             "resource_name": "stgacct-prod-eastus",
             "description": "Blob, Table, Queue storage",
-            "icon": "hard_drive",
             "status": "Running",
             "region": "East US"
         },
@@ -211,7 +201,6 @@ def seed_template_resources(
             "title": "Azure Key Vault",
             "resource_name": "keyvault-prod-eastus",
             "description": "Secrets and certificate management",
-            "icon": "lock",
             "status": "Running",
             "region": "East US"
         },
@@ -219,7 +208,6 @@ def seed_template_resources(
             "title": "Azure Load Balancer",
             "resource_name": "lb-frontend-prod",
             "description": "Network load balancing",
-            "icon": "network",
             "status": "Running",
             "region": "East US"
         },
@@ -227,7 +215,6 @@ def seed_template_resources(
             "title": "Azure API Management",
             "resource_name": "apim-prod-eastus",
             "description": "API gateway and management",
-            "icon": "link",
             "status": "Running",
             "region": "East US"
         },
@@ -235,7 +222,6 @@ def seed_template_resources(
             "title": "Azure Container Registry",
             "resource_name": "acr-prod-eastus",
             "description": "Docker container image repository",
-            "icon": "container",
             "status": "Running",
             "region": "East US"
         },
@@ -243,7 +229,6 @@ def seed_template_resources(
             "title": "Azure Functions",
             "resource_name": "func-app-serverless",
             "description": "Serverless compute functions",
-            "icon": "zap",
             "status": "Running",
             "region": "East US"
         },
@@ -251,7 +236,6 @@ def seed_template_resources(
             "title": "Azure Service Bus",
             "resource_name": "servicebus-prod",
             "description": "Message queuing and pub/sub",
-            "icon": "activity",
             "status": "Running",
             "region": "East US"
         },
@@ -259,7 +243,6 @@ def seed_template_resources(
             "title": "Azure Application Insights",
             "resource_name": "appinsights-prod",
             "description": "Application monitoring and analytics",
-            "icon": "shield",
             "status": "Running",
             "region": "East US"
         }
@@ -272,7 +255,6 @@ def seed_template_resources(
             title=template["title"],
             resource_name=template["resource_name"],
             description=template["description"],
-            icon=template["icon"],
             status=template["status"],
             region=template["region"]
         )
@@ -282,7 +264,6 @@ def seed_template_resources(
         created_resources.append(ResourceResponse(
             id=resource.id,
             user_id=str(resource.user_id),
-            icon=resource.icon,
             title=resource.title,
             resource_name=resource.resource_name,
             description=resource.description,
