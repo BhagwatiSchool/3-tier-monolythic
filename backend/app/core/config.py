@@ -41,6 +41,13 @@ class Settings:
         self.AZURE_SQL_USERNAME = os.getenv("AZURE_SQL_USERNAME", "")
         self.AZURE_SQL_PASSWORD = os.getenv("AZURE_SQL_PASSWORD", "")
         
+        # DEBUG: Show what was loaded
+        if self.AZURE_SQL_SERVER:
+            print(f"  ✅ Server: {self.AZURE_SQL_SERVER}")
+            print(f"  ✅ Database: {self.AZURE_SQL_DATABASE}")
+            print(f"  ✅ Username: {self.AZURE_SQL_USERNAME}")
+            print(f"  ✅ Password: {'*' * len(self.AZURE_SQL_PASSWORD) if self.AZURE_SQL_PASSWORD else 'NOT SET'}")
+        
         # Security Configuration
         self.SECRET_KEY = os.getenv("SECRET_KEY", "development-secret-key-change-in-production")
         self.ALGORITHM = "HS256"
