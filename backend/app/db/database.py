@@ -11,12 +11,13 @@ load_dotenv(env_file)
 
 from app.core.config import settings
 
-# Determine database connection
+# 🔴 यह बदलना है: Determine database connection - PRODUCTION uses Azure SQL only
 if settings.AZURE_SQL_SERVER and settings.AZURE_SQL_DATABASE:
     print(f"✅ Using Azure SQL: {settings.AZURE_SQL_SERVER}")
     database_url = settings.DATABASE_URL
     engine_kwargs = {"echo": False}
 else:
+    # 🔴 यह बदलना है: Fallback to SQLite only for local development (NOT used in production)
     print("⚠️  Using SQLite for local development")
     db_dir = Path(__file__).parent.parent.parent / "data"
     db_dir.mkdir(exist_ok=True)
@@ -33,10 +34,11 @@ Base = declarative_base()
 
 def init_db():
     """Initialize database and fix schema if needed"""
+    # 🔴 यह बदलना है: Azure SQL-specific initialization for production
     try:
         if "mssql" in str(database_url):
             with engine.begin() as conn:
-                # Fix resources table
+                # 🔴 यह बदलना है: Fix resources table for Azure SQL
                 check_table = text("""
                     SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES 
                     WHERE TABLE_NAME = 'resources'
@@ -56,6 +58,7 @@ def init_db():
                         resources_exists = False
                 
                 if not resources_exists:
+                    # 🔴 यह बदलना है: Create resources table with Azure SQL syntax
                     conn.execute(text("""
                     CREATE TABLE resources (
                         id INT PRIMARY KEY IDENTITY(1,1),
@@ -73,7 +76,7 @@ def init_db():
                     """))
                     print("✅ Created resources table")
                 
-                # Fix theme_config table
+                # 🔴 यह बदलना है: Fix theme_config table for Azure SQL
                 check_theme = text("""
                     SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES 
                     WHERE TABLE_NAME = 'theme_config'
@@ -95,6 +98,7 @@ def init_db():
                         theme_exists = False
                 
                 if not theme_exists:
+                    # 🔴 यह बदलना है: Create theme_config table with Azure SQL syntax (2000 chars for theme JSON)
                     conn.execute(text("""
                     CREATE TABLE theme_config (
                         id INT PRIMARY KEY IDENTITY(1,1),

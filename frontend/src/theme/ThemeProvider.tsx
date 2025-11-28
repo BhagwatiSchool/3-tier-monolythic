@@ -58,12 +58,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [remoteConfig, setRemoteConfig] = useState<ThemeShape | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  // 🔴 यह बदलना है: Added to prevent mode-only saves from overwriting full theme config during initial load
   const [hasLoadedTheme, setHasLoadedTheme] = useState(false);
 
   // Define saveTheme early so it's available for useEffects
+  // 🔴 यह बदलना है: Fixed merge logic to preserve colors when saving theme mode
   const saveTheme = async (cfg?: Partial<ThemeShape>) => {
     // merge with remote config - keep all user-specific settings
     const payload = { ...(remoteConfig || {}), ...(cfg || {}) };
+    // 🔴 यह बदलना है: Priority logic to ensure mode is set correctly
     if (cfg?.mode) {
       payload.mode = cfg.mode;
     } else if (remoteConfig?.mode) {
@@ -92,6 +95,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   // Save theme mode change to backend (per user) - only on theme change, NOT on remoteConfig change
+  // 🔴 यह बदलना है: Added hasLoadedTheme check to prevent overwrites during initialization
   useEffect(() => {
     // Skip saving during initial load - wait until theme is loaded from server
     // Only save mode if we've successfully loaded a theme from backend
@@ -166,13 +170,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             setTheme('light');
           }
           
-          // Mark that we've successfully loaded a theme
+          // 🔴 यह बदलना है: Mark theme as loaded to enable mode-only saves
           setHasLoadedTheme(true);
         } else {
           // No saved theme - use defaults
           console.log(`ℹ️ No theme found, using defaults`);
           setRemoteConfig(null);
           setTheme('light');
+          // 🔴 यह बदलना है: Mark as loaded even with no saved theme
           setHasLoadedTheme(true);
         }
       } catch (err) {
@@ -181,6 +186,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         if (mounted) {
           setRemoteConfig(null);
           setTheme('light');
+          // 🔴 यह बदलना है: Mark as loaded even on error to allow normal operation
           setHasLoadedTheme(true);
         }
       } finally {
