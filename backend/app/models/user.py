@@ -31,7 +31,7 @@ class User(Base):
 class ThemeConfig(Base):
     __tablename__ = "theme_config"
     
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(Integer, primary_key=True, autoincrement=True)
     config_key = Column(String(100), unique=True, nullable=False)
     config_value = Column(String(500), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
