@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -51,6 +54,9 @@ export default function UserManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
+  const [selectedUserForReset, setSelectedUserForReset] = useState<any | null>(null);
+  const [resetPasswordValue, setResetPasswordValue] = useState('');
 
   const currentRole = (currentUser as any)?.role;
   const isAdmin = currentRole === 'admin';
@@ -94,6 +100,23 @@ export default function UserManagement() {
     },
   });
 
+  // Reset password mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
+      return await api.resetUserPassword(userId, password);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+      toast({ title: 'Success', description: 'Password reset successfully!' });
+      setIsResetPasswordModalOpen(false);
+      setSelectedUserForReset(null);
+      setResetPasswordValue('');
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to reset password', variant: 'destructive' });
+    },
+  });
+
   const handleRoleChange = (userId: string, newRole: string) => {
     updateRole.mutate({ userId, role: newRole });
   };
@@ -101,6 +124,16 @@ export default function UserManagement() {
   const handleDeleteConfirm = () => {
     if (deleteUserId) {
       deleteUserMutation.mutate(deleteUserId);
+    }
+  };
+
+  const handleResetPassword = () => {
+    if (!resetPasswordValue || resetPasswordValue.length < 6) {
+      toast({ title: 'Error', description: 'Password must be at least 6 characters', variant: 'destructive' });
+      return;
+    }
+    if (selectedUserForReset) {
+      resetPasswordMutation.mutate({ userId: selectedUserForReset.id, password: resetPasswordValue });
     }
   };
 
@@ -224,16 +257,32 @@ export default function UserManagement() {
                                 <span>Protected</span>
                               </div>
                             ) : (
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => setDeleteUserId(user.id)}
-                                disabled={deleteUserMutation.isPending}
-                                className="w-full sm:w-auto"
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                              </Button>
+                              <div className="flex gap-2 flex-col sm:flex-row">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedUserForReset(user);
+                                    setResetPasswordValue('');
+                                    setIsResetPasswordModalOpen(true);
+                                  }}
+                                  disabled={resetPasswordMutation.isPending}
+                                  className="w-full sm:w-auto"
+                                >
+                                  <Lock className="h-4 w-4 mr-2" />
+                                  Reset Password
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => setDeleteUserId(user.id)}
+                                  disabled={deleteUserMutation.isPending}
+                                  className="w-full sm:w-auto"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </Button>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -268,6 +317,53 @@ export default function UserManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Reset Password Modal */}
+      <Dialog open={isResetPasswordModalOpen} onOpenChange={setIsResetPasswordModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+          </DialogHeader>
+          {selectedUserForReset && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Resetting password for: <span className="font-semibold">{selectedUserForReset.email}</span>
+                </p>
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={resetPasswordValue}
+                  onChange={(e) => setResetPasswordValue(e.target.value)}
+                  placeholder="Enter new password (min 6 chars)"
+                  className="mt-2"
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleResetPassword}
+                  disabled={resetPasswordMutation.isPending}
+                  className="flex-1"
+                >
+                  Reset Password
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsResetPasswordModalOpen(false);
+                    setSelectedUserForReset(null);
+                    setResetPasswordValue('');
+                  }}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

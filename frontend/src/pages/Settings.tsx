@@ -93,10 +93,6 @@ export default function Settings() {
     created_at: new Date().toISOString().slice(0, 16)
   });
 
-  // Users Management State
-  const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
-  const [selectedUserForReset, setSelectedUserForReset] = useState<any | null>(null);
-  const [resetPasswordValue, setResetPasswordValue] = useState('');
 
   // Fetch user data
   useEffect(() => {
@@ -115,19 +111,6 @@ export default function Settings() {
     },
   });
 
-  // Fetch users (admin only)
-  const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useQuery<any[]>({
-    queryKey: ['users'],
-    queryFn: async (): Promise<any[]> => {
-      try {
-        const response = await api.getUsers();
-        return (Array.isArray(response) ? response : []) as any[];
-      } catch {
-        return [];
-      }
-    },
-    enabled: user?.role === 'admin'
-  });
 
   // Update Creator Info
   const updateCreatorInfo = useMutation({
@@ -191,22 +174,6 @@ export default function Settings() {
     },
   });
 
-  // Reset User Password
-  const resetPassword = useMutation({
-    mutationFn: async ({ userId, password }: { userId: string; password: string }) => {
-      return await api.resetUserPassword(userId, password);
-    },
-    onSuccess: () => {
-      refetchUsers();
-      toast.success('Password reset successfully!');
-      setIsResetPasswordModalOpen(false);
-      setSelectedUserForReset(null);
-      setResetPasswordValue('');
-    },
-    onError: () => {
-      toast.error('Failed to reset password');
-    },
-  });
 
   const handleSaveCreatorInfo = () => {
     updateCreatorInfo.mutate();
@@ -268,15 +235,6 @@ export default function Settings() {
     }
   };
 
-  const handleResetPassword = () => {
-    if (!resetPasswordValue || resetPasswordValue.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return;
-    }
-    if (selectedUserForReset) {
-      resetPassword.mutate({ userId: selectedUserForReset.id, password: resetPasswordValue });
-    }
-  };
 
   const getIconComponent = (iconName: string) => {
     const icon = iconOptions.find(opt => opt.value === iconName);
@@ -431,116 +389,7 @@ export default function Settings() {
           )}
         </div>
         )}
-        {/* Users Management Section - Admin Only */}
-        {user?.role === 'admin' && (
-        <Card className="mb-8 border-blue-200 bg-gradient-to-br from-blue-50 to-transparent">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-lg bg-blue-100">
-                <UserCircle2 className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <CardTitle className="text-2xl">User Password Management</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">Reset user passwords</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {usersLoading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary" />
-                <p className="mt-4 text-muted-foreground">Loading users...</p>
-              </div>
-            ) : users.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No users found</p>
-            ) : (
-              <div className="space-y-3">
-                {users.map((u) => (
-                  <div key={u.id} className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-blue-500" />
-                        <h3 className="font-semibold text-gray-900">{u.display_name || u.email.split('@')[0]}</h3>
-                        {u.role === 'admin' && (
-                          <span className="text-xs font-bold px-2 py-1 bg-amber-100 text-amber-700 rounded-full">Admin</span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600">{u.email}</p>
-                      <p className="text-xs text-gray-500 mt-1">Joined {new Date(u.created_at).toLocaleDateString()}</p>
-                    </div>
-                    <div className="ml-4">
-                      {u.id !== user.id ? (
-                        <Button
-                          onClick={() => {
-                            setSelectedUserForReset(u);
-                            setResetPasswordValue('');
-                            setIsResetPasswordModalOpen(true);
-                          }}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                          size="sm"
-                        >
-                          <Lock className="mr-2 h-4 w-4" />
-                          Reset Password
-                        </Button>
-                      ) : (
-                        <div className="text-xs text-gray-500 italic">This is you</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        )}
-        {/* End Users Management Section */}
 
-        {/* Reset Password Modal */}
-        <Dialog open={isResetPasswordModalOpen} onOpenChange={setIsResetPasswordModalOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Reset Password</DialogTitle>
-            </DialogHeader>
-            {selectedUserForReset && (
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Resetting password for: <span className="font-semibold">{selectedUserForReset.email}</span>
-                  </p>
-                  <Label htmlFor="new-password">New Password</Label>
-                  <Input
-                    id="new-password"
-                    type="password"
-                    value={resetPasswordValue}
-                    onChange={(e) => setResetPasswordValue(e.target.value)}
-                    placeholder="Enter new password (min 6 chars)"
-                    className="mt-2"
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <Button
-                    onClick={handleResetPassword}
-                    disabled={resetPassword.isPending}
-                    className="flex-1"
-                  >
-                    Reset Password
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsResetPasswordModalOpen(false);
-                      setSelectedUserForReset(null);
-                      setResetPasswordValue('');
-                    }}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
 
         {/* Resource Edit Modal */}
         <Dialog open={isResourceModalOpen} onOpenChange={setIsResourceModalOpen}>
