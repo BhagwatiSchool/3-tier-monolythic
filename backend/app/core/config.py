@@ -3,13 +3,11 @@ from urllib.parse import quote
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load .env file from multiple possible locations
+# Load .env file from multiple possible locations (any user, any server)
 possible_paths = [
+    Path.home() / '.env',  # User's home directory (~/.env) - works for ANY user!
     Path.cwd() / '.env',  # Current working directory
     Path(__file__).resolve().parent.parent.parent / '.env',  # Relative to this file
-    Path.home() / '.env',  # Home directory (~/.env)
-    Path('/home/ritesh/app/.env'),  # VM ritesh user
-    Path('/home/azureuser/app/.env'),  # VM azureuser
 ]
 
 env_loaded = False
