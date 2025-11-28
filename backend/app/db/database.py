@@ -97,7 +97,7 @@ def init_db():
                 if not theme_exists:
                     conn.execute(text("""
                     CREATE TABLE theme_config (
-                        id VARCHAR(36) PRIMARY KEY,
+                        id INT PRIMARY KEY IDENTITY(1,1),
                         config_key VARCHAR(100) UNIQUE NOT NULL,
                         config_value VARCHAR(500) NOT NULL,
                         created_at DATETIME DEFAULT GETUTCDATE(),
