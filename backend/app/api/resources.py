@@ -106,6 +106,254 @@ TEMPLATE_RESOURCES = [
         "icon": "shield",
         "status": "Running",
         "region": "East US"
+    },
+    {
+        "title": "Azure Virtual Network",
+        "resource_name": "vnet-prod-eastus",
+        "description": "Virtual networking and connectivity",
+        "icon": "network",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure VPN Gateway",
+        "resource_name": "vpn-gateway-prod",
+        "description": "Secure site-to-site connectivity",
+        "icon": "lock",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure ExpressRoute",
+        "resource_name": "expressroute-prod",
+        "description": "Dedicated network connection",
+        "icon": "link",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure CDN",
+        "resource_name": "cdn-prod-eastus",
+        "description": "Content delivery network",
+        "icon": "globe",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Monitor",
+        "resource_name": "monitor-prod",
+        "description": "Comprehensive monitoring platform",
+        "icon": "activity",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Log Analytics",
+        "resource_name": "log-analytics-prod",
+        "description": "Log collection and analysis",
+        "icon": "database",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Security Center",
+        "resource_name": "security-center-prod",
+        "description": "Unified security management",
+        "icon": "shield",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Backup",
+        "resource_name": "backup-vault-prod",
+        "description": "Data protection and recovery",
+        "icon": "box",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Site Recovery",
+        "resource_name": "site-recovery-prod",
+        "description": "Disaster recovery solution",
+        "icon": "zap",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure DevOps",
+        "resource_name": "devops-project-prod",
+        "description": "CI/CD and project management",
+        "icon": "activity",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Data Factory",
+        "resource_name": "data-factory-prod",
+        "description": "Data integration and ETL",
+        "icon": "database",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Synapse Analytics",
+        "resource_name": "synapse-prod-eastus",
+        "description": "Big data and analytics",
+        "icon": "box",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Databricks",
+        "resource_name": "databricks-prod",
+        "description": "Apache Spark analytics platform",
+        "icon": "zap",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Machine Learning",
+        "resource_name": "ml-workspace-prod",
+        "description": "ML model development and deployment",
+        "icon": "cloud",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Cognitive Services",
+        "resource_name": "cognitive-services-prod",
+        "description": "AI APIs for vision, language, speech",
+        "icon": "zap",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Bot Service",
+        "resource_name": "bot-service-prod",
+        "description": "Build intelligent bots",
+        "icon": "globe",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Search",
+        "resource_name": "search-service-prod",
+        "description": "Full-text search capability",
+        "icon": "box",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Redis Cache",
+        "resource_name": "redis-cache-prod",
+        "description": "In-memory data store",
+        "icon": "database",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure IoT Hub",
+        "resource_name": "iot-hub-prod",
+        "description": "IoT device management and data",
+        "icon": "zap",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Event Hubs",
+        "resource_name": "event-hub-prod",
+        "description": "Real-time data streaming",
+        "icon": "activity",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Stream Analytics",
+        "resource_name": "stream-analytics-prod",
+        "description": "Real-time analytics processing",
+        "icon": "activity",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Time Series Insights",
+        "resource_name": "tsi-prod-eastus",
+        "description": "Time series data storage and analysis",
+        "icon": "database",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Digital Twins",
+        "resource_name": "digital-twins-prod",
+        "description": "Digital representation platform",
+        "icon": "cloud",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Bastion",
+        "resource_name": "bastion-prod-eastus",
+        "description": "Secure remote access to VMs",
+        "icon": "lock",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Firewall",
+        "resource_name": "firewall-prod-eastus",
+        "description": "Network security and threat protection",
+        "icon": "shield",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure DDoS Protection",
+        "resource_name": "ddos-protection-prod",
+        "description": "DDoS attack mitigation",
+        "icon": "shield",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Front Door",
+        "resource_name": "front-door-prod",
+        "description": "Global load balancer and WAF",
+        "icon": "link",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Traffic Manager",
+        "resource_name": "traffic-manager-prod",
+        "description": "DNS-based traffic management",
+        "icon": "network",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Private Link",
+        "resource_name": "private-link-prod",
+        "description": "Private connectivity to Azure services",
+        "icon": "lock",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Notification Hubs",
+        "resource_name": "notification-hub-prod",
+        "description": "Push notification platform",
+        "icon": "activity",
+        "status": "Running",
+        "region": "East US"
+    },
+    {
+        "title": "Azure Service Fabric",
+        "resource_name": "service-fabric-prod",
+        "description": "Distributed systems platform",
+        "icon": "boxes",
+        "status": "Running",
+        "region": "East US"
     }
 ]
 
