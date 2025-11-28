@@ -10,11 +10,14 @@ if (typeof window !== 'undefined') {
   const protocol = window.location.protocol;
   
   if (hostname.includes('replit.dev')) {
-    // Replit: use same domain, port 8000, same protocol
+    // Replit: direct connection to backend on port 8000
     API_BASE_URL = `${protocol}//${hostname}:8000`;
   } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
     // Local development
     API_BASE_URL = 'http://localhost:8000';
+  } else {
+    // Production VMs: nginx proxies /api/ to backend
+    API_BASE_URL = '/api';
   }
 }
 
