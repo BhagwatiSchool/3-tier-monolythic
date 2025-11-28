@@ -35,9 +35,20 @@ export default function Auth() {
         description: 'Logged in successfully!',
       });
     } catch (error: any) {
+      let errorMessage = 'Failed to sign in';
+      
+      // Check for specific error messages
+      if (error.message?.includes('401') || error.message?.toLowerCase().includes('unauthorized')) {
+        errorMessage = 'Invalid email or password. Please check and try again.';
+      } else if (error.message?.includes('404')) {
+        errorMessage = 'Account not found. Please check your email.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to sign in',
+        title: 'Login Failed',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
