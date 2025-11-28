@@ -97,6 +97,25 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     saveMode();
   }, [theme, user]);
 
+  // Apply CSS variables when remoteConfig changes
+  useEffect(() => {
+    if (remoteConfig) {
+      // Apply primary color
+      if ((remoteConfig as any).primaryColor) {
+        const primaryHSL = hexToHSL((remoteConfig as any).primaryColor);
+        document.documentElement.style.setProperty('--primary', primaryHSL);
+        document.documentElement.style.setProperty('--ring', primaryHSL);
+        console.log(`✅ Applied primary color: ${(remoteConfig as any).primaryColor} -> ${primaryHSL}`);
+      }
+      // Apply accent color
+      if ((remoteConfig as any).accentColor) {
+        const accentHSL = hexToHSL((remoteConfig as any).accentColor);
+        document.documentElement.style.setProperty('--accent', accentHSL);
+        console.log(`✅ Applied accent color: ${(remoteConfig as any).accentColor} -> ${accentHSL}`);
+      }
+    }
+  }, [remoteConfig]);
+
   // load remote config when user logs in (user-specific theme)
   useEffect(() => {
     let mounted = true;
@@ -111,40 +130,39 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           if (mounted) {
             setRemoteConfig(null);
             setTheme('light');
+            // Reset CSS variables to defaults
+            document.documentElement.style.removeProperty('--primary');
+            document.documentElement.style.removeProperty('--accent');
+            document.documentElement.style.removeProperty('--ring');
             setLoading(false);
             setIsInitialLoad(false);
           }
           return;
         }
         
+        console.log(`🔄 Loading theme for user ${user.id}...`);
         const cfg = await api.getTheme();
         if (!mounted) return;
+        
         if (cfg && Object.keys(cfg).length > 0) {
+          console.log(`✅ Theme loaded:`, cfg);
           setRemoteConfig(cfg);
           
           // Use user's saved theme mode
           if ((cfg as any).mode) {
             setTheme((cfg as any).mode as ThemeMode);
+            console.log(`✅ Set theme mode: ${(cfg as any).mode}`);
           } else {
-            setTheme('light'); // default
-          }
-          
-          // Apply saved CSS variables if present
-          if ((cfg as any).primaryColor) {
-            const primaryHSL = hexToHSL((cfg as any).primaryColor);
-            document.documentElement.style.setProperty('--primary', primaryHSL);
-            document.documentElement.style.setProperty('--ring', primaryHSL);
-          }
-          if ((cfg as any).accentColor) {
-            const accentHSL = hexToHSL((cfg as any).accentColor);
-            document.documentElement.style.setProperty('--accent', accentHSL);
+            setTheme('light');
           }
         } else {
           // No saved theme - use defaults
+          console.log(`ℹ️ No theme found, using defaults`);
           setRemoteConfig(null);
           setTheme('light');
         }
       } catch (err) {
+        console.error('❌ Failed to load theme:', err);
         // backend may not have theme — use defaults
         if (mounted) {
           setRemoteConfig(null);

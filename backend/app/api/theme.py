@@ -19,8 +19,15 @@ def get_user_theme(
     config = db.query(ThemeConfig).filter(ThemeConfig.config_key == config_key).first()
     
     if config and config.config_value:
-        return json.loads(config.config_value)
+        try:
+            theme_data = json.loads(config.config_value)
+            print(f"✅ Loaded theme for user {current_user.id}: {theme_data}")
+            return theme_data
+        except json.JSONDecodeError:
+            print(f"❌ Failed to parse theme for user {current_user.id}")
+            return {}
     
+    print(f"ℹ️ No theme found for user {current_user.id}")
     return {}
 
 
@@ -34,6 +41,8 @@ def save_user_theme(
     config = db.query(ThemeConfig).filter(ThemeConfig.config_key == config_key).first()
     
     theme_json = json.dumps(theme_data)
+    print(f"✅ Saving theme for user {current_user.id}: {theme_data}")
+    print(f"   JSON size: {len(theme_json)} chars")
     
     if not config:
         config = ThemeConfig(
@@ -41,11 +50,14 @@ def save_user_theme(
             config_value=theme_json
         )
         db.add(config)
+        print(f"   Created new theme record")
     else:
         config.config_value = theme_json
+        print(f"   Updated existing theme record")
     
     db.commit()
     db.refresh(config)
+    print(f"   Theme saved successfully")
     return theme_data
 
 

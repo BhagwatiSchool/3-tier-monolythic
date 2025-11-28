@@ -33,6 +33,6 @@ class ThemeConfig(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     config_key = Column(String(100), unique=True, nullable=False)
-    config_value = Column(String(500), nullable=False)
+    config_value = Column(String(2000), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
