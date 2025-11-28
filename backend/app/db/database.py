@@ -110,6 +110,45 @@ def init_db():
                     CREATE INDEX idx_theme_config_key ON theme_config(config_key);
                     """))
                     print("✅ Created theme_config table")
+                
+                # 🔴 यह बदलना है: Fix users table - add missing columns if they don't exist
+                check_users = text("""
+                    SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES 
+                    WHERE TABLE_NAME = 'users'
+                """)
+                result = conn.execute(check_users)
+                users_exists = result.scalar() > 0
+                
+                if users_exists:
+                    # Check for missing columns
+                    missing_columns = []
+                    columns_to_check = [
+                        ('display_name', "VARCHAR(100)"),
+                        ('tagline', "VARCHAR(200)"),
+                        ('bio', "VARCHAR(500)"),
+                        ('avatar_url', "VARCHAR(500)"),
+                        ('is_protected', "BIT")
+                    ]
+                    
+                    for col_name, col_type in columns_to_check:
+                        check_col = text(f"""
+                            SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                            WHERE TABLE_NAME = 'users' AND COLUMN_NAME = '{col_name}'
+                        """)
+                        result = conn.execute(check_col)
+                        if result.scalar() == 0:
+                            missing_columns.append((col_name, col_type))
+                    
+                    # Add missing columns
+                    for col_name, col_type in missing_columns:
+                        try:
+                            if col_name == 'is_protected':
+                                conn.execute(text(f"ALTER TABLE users ADD {col_name} {col_type} DEFAULT 0"))
+                            else:
+                                conn.execute(text(f"ALTER TABLE users ADD {col_name} {col_type}"))
+                            print(f"✅ Added missing column: users.{col_name}")
+                        except Exception as col_err:
+                            print(f"⚠️  Could not add column {col_name}: {col_err}")
     except Exception as e:
         print(f"⚠️  Database init error: {e}")
 

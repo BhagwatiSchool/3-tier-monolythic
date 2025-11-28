@@ -1,0 +1,85 @@
+(venv) ritesh@backend:~$ python run.py
+INFO:     Will watch for changes in these directories: ['/home/ritesh']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [14036] using WatchFiles
+✅ Server configured for: ritserver.database.windows.net
+✅ Using Azure SQL: ritserver.database.windows.net
+INFO:     Started server process [14038]
+INFO:     Waiting for application startup.
+ERROR:    Traceback (most recent call last):
+  File "src/pymssql/_pymssql.pyx", line 461, in pymssql._pymssql.Cursor.execute
+  File "src/pymssql/_mssql.pyx", line 1087, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src/pymssql/_mssql.pyx", line 1118, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src/pymssql/_mssql.pyx", line 1251, in pymssql._mssql.MSSQLConnection.format_and_run_query
+  File "src/pymssql/_mssql.pyx", line 1789, in pymssql._mssql.check_cancel_and_raise
+  File "src/pymssql/_mssql.pyx", line 1835, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (207, b"Invalid column name 'display_name'.DB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\n")
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+  File "src/pymssql/_pymssql.pyx", line 476, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.ProgrammingError: (207, b"Invalid column name 'display_name'.DB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\n")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ritesh/venv/lib/python3.12/site-packages/starlette/routing.py", line 677, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+  File "/home/ritesh/venv/lib/python3.12/site-packages/starlette/routing.py", line 566, in __aenter__
+    await self._router.startup()
+  File "/home/ritesh/venv/lib/python3.12/site-packages/starlette/routing.py", line 656, in startup
+    handler()
+  File "/home/ritesh/app/main.py", line 43, in startup_event
+    create_super_user(db)
+  File "/home/ritesh/app/db/super_user_seed.py", line 14, in create_super_user
+    ).all()
+      ^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2693, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/ritesh/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+  File "src/pymssql/_pymssql.pyx", line 476, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.ProgrammingError: (pymssql._pymssql.ProgrammingError) (207, b"Invalid column name 'display_name'.DB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\nDB-Lib error message 20018, severity 16:\nGeneral SQL Server error: Check messages from the SQL Server\n")
+[SQL: SELECT users.id AS users_id, users.email AS users_email, users.hashed_password AS users_hashed_password, users.display_name AS users_display_name, users.tagline AS users_tagline, users.bio AS users_bio, users.avatar_url AS users_avatar_url, users.role AS users_role, users.is_protected AS users_is_protected, users.created_at AS users_created_at
+FROM users
+WHERE users.role = %(role_1)s AND users.email != %(email_1)s]
+[parameters: {'role_1': 'admin', 'email_1': 'ritesh@apka.bhai'}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+
+ERROR:    Application startup failed. Exiting.
