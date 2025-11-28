@@ -15,6 +15,9 @@ if (typeof window !== 'undefined') {
   } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
     // Local development
     API_BASE_URL = 'http://localhost:8000';
+  } else {
+    // Custom deployment (VM, custom IP, etc)
+    API_BASE_URL = `${protocol}//${hostname}:8000`;
   }
 }
 
