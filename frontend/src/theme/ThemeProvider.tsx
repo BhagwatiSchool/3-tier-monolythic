@@ -108,14 +108,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         // Only fetch theme if user is authenticated
         const token = localStorage.getItem('access_token');
         if (!token || !user) {
-          setLoading(false);
-          setIsInitialLoad(false);
+          // Reset to default when user logs out
+          if (mounted) {
+            setRemoteConfig(null);
+            setTheme('light');
+            setLoading(false);
+            setIsInitialLoad(false);
+          }
           return;
         }
         
         const cfg = await api.getTheme();
         if (!mounted) return;
-        if (cfg) {
+        if (cfg && Object.keys(cfg).length > 0) {
           setRemoteConfig(cfg);
           
           // Use user's saved theme mode
@@ -136,11 +141,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             document.documentElement.style.setProperty('--accent', accentHSL);
           }
         } else {
+          // No saved theme - use defaults
+          setRemoteConfig(null);
           setTheme('light');
         }
       } catch (err) {
-        // backend may not have theme — ignore silently
-        setTheme('light');
+        // backend may not have theme — use defaults
+        if (mounted) {
+          setRemoteConfig(null);
+          setTheme('light');
+        }
       } finally {
         if (mounted) {
           setLoading(false);
