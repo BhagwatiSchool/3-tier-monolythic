@@ -3,11 +3,21 @@ from urllib.parse import quote
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load .env file from multiple possible locations (any user, any server)
+# Load .env file - Auto-detect + Custom paths support
+# Priority order:
+# 1. HOME directory (works for ANY user automatically)
+# 2. Custom paths (if someone wants to change location)
+# 3. Current working directory
+# 4. Relative to this file
+
 possible_paths = [
-    Path.home() / '.env',  # User's home directory (~/.env) - works for ANY user!
+    Path.home() / '.env',  # Auto-detect user home (~/.env)
     Path.cwd() / '.env',  # Current working directory
-    Path(__file__).resolve().parent.parent.parent / '.env',  # Relative to this file
+    Path(__file__).resolve().parent.parent.parent / '.env',  # Project root
+    # Custom paths (uncomment and modify if needed):
+    # Path('/custom/path/.env'),
+    # Path('/home/ritesh/custom/.env'),
+    # Path('/home/azureuser/custom/.env'),
 ]
 
 env_loaded = False
