@@ -1,5 +1,30 @@
 # Deployment Guide
 
+## 🚀 Quick Deploy (Automated Scripts)
+
+### Frontend VM - One Command Deploy
+```bash
+# On Frontend VM (52.138.183.170):
+bash deploy-frontend.sh
+```
+✅ Automatically:
+- Builds frontend
+- Copies files to nginx
+- Configures nginx with proper routing
+- Restarts services
+
+### Backend VM - One Command Deploy
+```bash
+# On Backend VM (4.210.68.49):
+bash deploy-backend.sh
+```
+✅ Automatically:
+- Sets up Python venv
+- Installs dependencies
+- Starts backend on port 8000
+
+---
+
 ## Frontend VM Deployment (52.138.183.170)
 
 ### 1. Build the Frontend
