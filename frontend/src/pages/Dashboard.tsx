@@ -59,14 +59,14 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="space-y-4 sm:space-y-6">
+      <div className="w-full h-full space-y-4 sm:space-y-6 px-2 sm:px-4 lg:px-6">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold mb-2">Welcome, {displayName}!</h2>
           <p className="text-sm sm:text-base text-muted-foreground">Monitor your Azure resources and services</p>
         </div>
 
         {/* Metrics Grid */}
-        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:gap-6 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.map((metric) => {
             const Icon = metric.icon;
             const isActiveResources = metric.title === 'Active Resources';

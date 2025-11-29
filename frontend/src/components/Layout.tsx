@@ -162,7 +162,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6">{children}</main>
+      <main className="w-full px-4 py-6 overflow-x-hidden">{children}</main>
     </div>
   );
 }
