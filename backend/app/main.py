@@ -31,18 +31,22 @@ app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 
 @app.on_event("startup")
 def startup_event():
-    # Create tables
-    Base.metadata.create_all(bind=engine)
-    init_db()  # Initialize/fix Azure SQL schema
-    
-    # Create super user
-    from app.db.database import SessionLocal
-    from app.db.super_user_seed import create_super_user
-    db = SessionLocal()
     try:
-        create_super_user(db)
-    finally:
-        db.close()
+        # Create tables
+        Base.metadata.create_all(bind=engine)
+        init_db()  # Initialize/fix Azure SQL schema
+        
+        # Create super user
+        from app.db.database import SessionLocal
+        from app.db.super_user_seed import create_super_user
+        db = SessionLocal()
+        try:
+            create_super_user(db)
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"⚠️ Database initialization warning: {str(e)[:100]}")
+        print("ℹ️ API will still start but database operations may fail")
 
 
 @app.get("/")
