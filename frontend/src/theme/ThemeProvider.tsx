@@ -92,10 +92,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (!hasLoadedTheme || !user || isInitialLoad) return;
     
     const saveMode = async () => {
+      console.log("💾 Saving theme mode:", theme, "for user:", user.id);
       try {
         await saveTheme({ mode: theme });
+        console.log("💾 Theme saved successfully!");
       } catch (err) {
-        // Silently fail - theme is still applied locally
+        console.error("💾 Failed to save theme:", err);
       }
     };
     saveMode();
@@ -129,29 +131,34 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             document.documentElement.style.removeProperty('--primary');
             document.documentElement.style.removeProperty('--accent');
             document.documentElement.style.removeProperty('--ring');
+            setHasLoadedTheme(false);
             setLoading(false);
             setIsInitialLoad(false);
           }
           return;
         }
         
+        console.log("🎨 Loading theme for user:", user.id);
         const cfg = await api.getTheme();
+        console.log("🎨 Fetched theme config:", cfg);
         if (!mounted) return;
         
         if (cfg && Object.keys(cfg).length > 0) {
+          console.log("🎨 Setting theme from saved config:", cfg);
           setRemoteConfig(cfg);
           if ((cfg as any).mode) {
             setTheme((cfg as any).mode as ThemeMode);
           } else {
             setTheme('light');
           }
-          setHasLoadedTheme(true);
         } else {
+          console.log("🎨 No saved theme, using defaults");
           setRemoteConfig(null);
           setTheme('light');
-          setHasLoadedTheme(true);
         }
+        setHasLoadedTheme(true);
       } catch (err) {
+        console.error('🎨 Failed to load theme:', err);
         if (mounted) {
           setRemoteConfig(null);
           setTheme('light');
