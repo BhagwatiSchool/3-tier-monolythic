@@ -110,7 +110,7 @@ export default function Layout({ children }: LayoutProps) {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-0 flex-1 ml-6 overflow-x-auto">
+          <nav className="hidden lg:flex items-center gap-0 flex-1 ml-6">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.to;
@@ -120,7 +120,7 @@ export default function Layout({ children }: LayoutProps) {
                   <Button
                     variant={isActive ? 'secondary' : 'ghost'}
                     size="sm"
-                    className="flex items-center gap-1 whitespace-nowrap px-2"
+                    className="flex items-center gap-1 whitespace-nowrap px-3 py-2"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-xs sm:text-sm">{item.label}</span>
