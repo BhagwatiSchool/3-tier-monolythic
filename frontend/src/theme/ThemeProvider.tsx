@@ -74,12 +74,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       payload.mode = theme;
     }
-    console.log(`💾 Saving theme:`, payload);
+    console.log(`\n💾 SAVING THEME:`, payload);
+    console.log(`   User ID: ${user?.id}`);
+    console.log(`   API URL: ${import.meta.env.VITE_API_URL}`);
     try {
-      await api.updateTheme(payload);
+      const response = await api.updateTheme(payload);
+      console.log(`✅ Theme saved successfully:`, response);
       setRemoteConfig(payload);
-    } catch (err) {
-      console.error('saveTheme failed', err);
+    } catch (err: any) {
+      console.error(`❌ Theme save failed:`, err?.message || err);
+      console.error(`   Full error:`, err);
       throw err;
     }
   };
