@@ -61,12 +61,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // 🔴 यह बदलना है: Added to prevent mode-only saves from overwriting full theme config during initial load
   const [hasLoadedTheme, setHasLoadedTheme] = useState(false);
 
-  // Define saveTheme early so it's available for useEffects
-  // 🔴 यह बदलना है: Fixed merge logic to preserve colors when saving theme mode
   const saveTheme = async (cfg?: Partial<ThemeShape>) => {
-    // merge with remote config - keep all user-specific settings
     const payload = { ...(remoteConfig || {}), ...(cfg || {}) };
-    // 🔴 यह बदलना है: Priority logic to ensure mode is set correctly
     if (cfg?.mode) {
       payload.mode = cfg.mode;
     } else if (remoteConfig?.mode) {
@@ -74,21 +70,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       payload.mode = theme;
     }
-    console.log(`\n💾 SAVING THEME:`, payload);
-    console.log(`   User ID: ${user?.id}`);
-    console.log(`   API URL: ${import.meta.env.VITE_API_URL}`);
     try {
-      const response = await api.updateTheme(payload);
-      console.log(`✅ Theme saved successfully:`, response);
+      await api.updateTheme(payload);
       setRemoteConfig(payload);
-    } catch (err: any) {
-      console.error(`❌ Theme save failed:`, err?.message || err);
-      console.error(`   Full error:`, err);
+    } catch (err) {
+      console.error('Failed to save theme:', err);
       throw err;
     }
   };
 
-  // set dark class for CSS (Tailwind/Shadcn standard)
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark') {
@@ -98,11 +88,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [theme]);
 
-  // Save theme mode change to backend (per user) - only on theme change, NOT on remoteConfig change
-  // 🔴 यह बदलना है: Added hasLoadedTheme check to prevent overwrites during initialization
   useEffect(() => {
-    // Skip saving during initial load - wait until theme is loaded from server
-    // Only save mode if we've successfully loaded a theme from backend
     if (!hasLoadedTheme || !user || isInitialLoad) return;
     
     const saveMode = async () => {
@@ -115,40 +101,31 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     saveMode();
   }, [theme, user, hasLoadedTheme, isInitialLoad]);
 
-  // Apply CSS variables when remoteConfig changes
   useEffect(() => {
     if (remoteConfig) {
-      // Apply primary color
       if ((remoteConfig as any).primaryColor) {
         const primaryHSL = hexToHSL((remoteConfig as any).primaryColor);
         document.documentElement.style.setProperty('--primary', primaryHSL);
         document.documentElement.style.setProperty('--ring', primaryHSL);
-        console.log(`✅ Applied primary color: ${(remoteConfig as any).primaryColor} -> ${primaryHSL}`);
       }
-      // Apply accent color
       if ((remoteConfig as any).accentColor) {
         const accentHSL = hexToHSL((remoteConfig as any).accentColor);
         document.documentElement.style.setProperty('--accent', accentHSL);
-        console.log(`✅ Applied accent color: ${(remoteConfig as any).accentColor} -> ${accentHSL}`);
       }
     }
   }, [remoteConfig]);
 
-  // load remote config when user logs in (user-specific theme)
   useEffect(() => {
     let mounted = true;
     setIsInitialLoad(true);
     
     (async () => {
       try {
-        // Only fetch theme if user is authenticated
         const token = localStorage.getItem('access_token');
         if (!token || !user) {
-          // Reset to default when user logs out
           if (mounted) {
             setRemoteConfig(null);
             setTheme('light');
-            // Reset CSS variables to defaults
             document.documentElement.style.removeProperty('--primary');
             document.documentElement.style.removeProperty('--accent');
             document.documentElement.style.removeProperty('--ring');
@@ -158,39 +135,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           return;
         }
         
-        console.log(`🔄 Loading theme for user ${user.id}...`);
         const cfg = await api.getTheme();
         if (!mounted) return;
         
         if (cfg && Object.keys(cfg).length > 0) {
-          console.log(`✅ Theme loaded:`, cfg);
           setRemoteConfig(cfg);
-          
-          // Use user's saved theme mode
           if ((cfg as any).mode) {
             setTheme((cfg as any).mode as ThemeMode);
-            console.log(`✅ Set theme mode: ${(cfg as any).mode}`);
           } else {
             setTheme('light');
           }
-          
-          // 🔴 यह बदलना है: Mark theme as loaded to enable mode-only saves
           setHasLoadedTheme(true);
         } else {
-          // No saved theme - use defaults
-          console.log(`ℹ️ No theme found, using defaults`);
           setRemoteConfig(null);
           setTheme('light');
-          // 🔴 यह बदलना है: Mark as loaded even with no saved theme
           setHasLoadedTheme(true);
         }
       } catch (err) {
-        console.error('❌ Failed to load theme:', err);
-        // backend may not have theme — use defaults
         if (mounted) {
           setRemoteConfig(null);
           setTheme('light');
-          // 🔴 यह बदलना है: Mark as loaded even on error to allow normal operation
           setHasLoadedTheme(true);
         }
       } finally {
