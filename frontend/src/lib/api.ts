@@ -2,8 +2,8 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type { LoginResponse, RegisterResponse, ProfileResponse } from '@/types/api';
 
-// Use relative URLs - routes to same server regardless of hostname/proxy
-const API_BASE_URL = "";
+// Get backend URL from env (for VM deployment) or use relative paths (for Replit proxy)
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL || "/",
