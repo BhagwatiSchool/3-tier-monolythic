@@ -3,23 +3,23 @@
 ## ✅ PRODUCTION READY
 
 ### Current Status
-- **Backend**: Running on Replit (localhost:8000) + Azure SQL configured
-- **Frontend**: Running on Replit preview + configured for both Replit and Azure
-- **Database**: Connected to Azure SQL (ritserver.database.windows.net)
+- **Backend**: ✅ Running at 172.31.106.162:8000 (Replit Network IP)
+- **Frontend**: ✅ Running at 172.31.106.162:5000 (Replit Network IP)
+- **Database**: ✅ Connected to Azure SQL (ritserver.database.windows.net)
 - **Features**: All complete ✅
 
 ---
 
 ## 🚀 DEPLOYMENT OPTIONS
 
-### Option 1: Replit Preview Testing (NOW)
+### Option 1: Replit Preview Testing (WORKING NOW ✅)
 ```
-Frontend: .replit.dev/auth (Replit preview)
-Backend: localhost:8000 (Replit)
+Frontend: http://172.31.106.162:5000/auth
+Backend: http://172.31.106.162:8000 (API)
 Database: Your Azure SQL
 ```
-- **env**: `VITE_API_URL=http://localhost:8000`
-- **Status**: ✅ Working
+- **env**: `VITE_API_URL=http://172.31.106.162:8000`
+- **Status**: ✅ Live and verified
 
 ### Option 2: Azure VMs Production
 ```
@@ -40,21 +40,17 @@ backend/app/api/theme.py
 backend/.env (Azure SQL configured)
 ```
 
-### Frontend - Replit Preview
+### Frontend (Update API URL per deployment)
 ```
-frontend/.env (localhost:8000)
-frontend/src/lib/api.ts
-frontend/src/theme/ThemeProvider.tsx
-frontend/src/pages/ThemeSettings.tsx
-frontend/src/components/Layout.tsx
+frontend/.env                   ⚙️ UPDATE: API URL
+frontend/src/lib/api.ts         ✅ API client
+frontend/src/theme/ThemeProvider.tsx    ✅ Theme persistence
+frontend/src/pages/ThemeSettings.tsx    ✅ Settings page
+frontend/src/components/Layout.tsx      ✅ Navigation
 ```
 
-### Frontend - Azure VMs
-```
-Change frontend/.env:
-  VITE_API_URL=http://98.71.89.64:8000
-Then copy other files as above
-```
+**For Replit**: `VITE_API_URL=http://172.31.106.162:8000`
+**For Azure**: `VITE_API_URL=http://98.71.89.64:8000`
 
 ---
 
@@ -90,13 +86,15 @@ Password: Aagebadho
 
 ## 📝 ENV VARIABLES
 
-### For Replit Preview:
-```
-VITE_API_URL=http://localhost:8000
+### For Replit Preview (Current - Working ✅):
+```env
+# frontend/.env
+VITE_API_URL=http://172.31.106.162:8000
 ```
 
-### For Azure VMs:
-```
+### For Azure VMs (Production):
+```env
+# frontend/.env (on Azure Frontend VM)
 VITE_API_URL=http://98.71.89.64:8000
 ```
 
@@ -114,12 +112,21 @@ CORS_ORIGINS=["*"]
 
 ---
 
-## 🎯 NEXT STEPS
+## ✅ STATUS
 
-1. **Test Replit Preview** - Done! Use admin credentials
-2. **Deploy to Azure VMs** - Copy files + update frontend .env
-3. **Test on Azure** - Verify theme persistence works
+### Replit Preview (Complete ✅)
+- ✅ Login tested and working
+- ✅ API connection verified
+- ✅ Theme persistence ready
+- ✅ Backend at 172.31.106.162:8000
+- ✅ Frontend at 172.31.106.162:5000
+
+### Azure VMs (Ready to deploy)
+1. Copy backend files to Backend VM (98.71.89.64)
+2. Copy frontend files to Frontend VM (134.149.42.111)
+3. Update frontend/.env: `VITE_API_URL=http://98.71.89.64:8000`
+4. Test login and features
 
 ---
 
-**All code is production-ready! 🚀**
+**All code is production-ready! Replit preview verified! 🚀**
