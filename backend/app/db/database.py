@@ -12,10 +12,12 @@ load_dotenv(env_file)
 
 from app.core.config import settings
 
-use_sqlite = os.getenv("USE_SQLITE", "false").lower() == "true" or not settings.AZURE_SQL_SERVER or not settings.AZURE_SQL_DATABASE
-
-if use_sqlite or not settings.DATABASE_URL:
-    print("✅ Using SQLite for development/testing")
+if settings.AZURE_SQL_SERVER and settings.AZURE_SQL_DATABASE:
+    print(f"✅ Using Azure SQL: {settings.AZURE_SQL_SERVER}")
+    database_url = settings.DATABASE_URL
+    engine_kwargs = {"echo": False}
+else:
+    print("✅ Using SQLite for local development")
     db_dir = Path(__file__).parent.parent.parent / "data"
     db_dir.mkdir(exist_ok=True)
     database_url = f"sqlite:///{db_dir}/app.db"
@@ -23,10 +25,6 @@ if use_sqlite or not settings.DATABASE_URL:
         "connect_args": {"check_same_thread": False},
         "echo": False
     }
-else:
-    print(f"✅ Using Azure SQL: {settings.AZURE_SQL_SERVER}")
-    database_url = settings.DATABASE_URL
-    engine_kwargs = {"echo": False}
 
 engine = create_engine(database_url, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
