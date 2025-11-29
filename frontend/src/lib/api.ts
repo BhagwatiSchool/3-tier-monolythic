@@ -6,15 +6,11 @@ let API_BASE_URL = "";
 
 // Compute API URL at runtime
 if (typeof window !== 'undefined') {
-  // Priority 1: Environment variable (for separate backends)
-  if (import.meta.env.VITE_API_URL) {
-    API_BASE_URL = import.meta.env.VITE_API_URL;
-  } else {
-    // Priority 2: Default to current hostname:8000 (same machine deployment)
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol;
-    API_BASE_URL = `${protocol}//${hostname}:8000`;
-  }
+  // Use window.location.hostname for most reliable API connectivity in Replit iframe
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  API_BASE_URL = `${protocol}//${hostname}:8000`;
+  console.log("✅ API URL:", API_BASE_URL);
 }
 
 const apiClient: AxiosInstance = axios.create({
