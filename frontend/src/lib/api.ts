@@ -2,19 +2,11 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type { LoginResponse, RegisterResponse, ProfileResponse } from '@/types/api';
 
-let API_BASE_URL = "";
-
-// Compute API URL at runtime
-if (typeof window !== 'undefined') {
-  // Use window.location.hostname for most reliable API connectivity in Replit iframe
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  API_BASE_URL = `${protocol}//${hostname}:8000`;
-  console.log("✅ API URL:", API_BASE_URL);
-}
+// Use relative URLs - routes to same server regardless of hostname/proxy
+const API_BASE_URL = "";
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_BASE_URL || "/",
   timeout: 30000,
   headers: { 'Content-Type': 'application/json' },
 });

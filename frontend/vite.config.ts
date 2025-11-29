@@ -18,6 +18,13 @@ export default defineConfig({
     hmr: {
       clientPort: 443,
     },
+    proxy: {
+      '/api': {
+        target: 'http://0.0.0.0:8000',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
+    },
   },
   build: {
     outDir: 'dist/public',
