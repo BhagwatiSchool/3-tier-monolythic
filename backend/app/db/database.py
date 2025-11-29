@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import sys
 
 # Load .env FIRST before importing settings
 env_file = Path(__file__).parent.parent.parent / ".env"
@@ -11,14 +12,10 @@ load_dotenv(env_file)
 
 from app.core.config import settings
 
-# 🔴 यह बदलना है: Determine database connection - PRODUCTION uses Azure SQL only
-if settings.AZURE_SQL_SERVER and settings.AZURE_SQL_DATABASE:
-    print(f"✅ Using Azure SQL: {settings.AZURE_SQL_SERVER}")
-    database_url = settings.DATABASE_URL
-    engine_kwargs = {"echo": False}
-else:
-    # 🔴 यह बदलना है: Fallback to SQLite only for local development (NOT used in production)
-    print("⚠️  Using SQLite for local development")
+use_sqlite = os.getenv("USE_SQLITE", "false").lower() == "true" or not settings.AZURE_SQL_SERVER or not settings.AZURE_SQL_DATABASE
+
+if use_sqlite or not settings.DATABASE_URL:
+    print("✅ Using SQLite for development/testing")
     db_dir = Path(__file__).parent.parent.parent / "data"
     db_dir.mkdir(exist_ok=True)
     database_url = f"sqlite:///{db_dir}/app.db"
@@ -26,6 +23,10 @@ else:
         "connect_args": {"check_same_thread": False},
         "echo": False
     }
+else:
+    print(f"✅ Using Azure SQL: {settings.AZURE_SQL_SERVER}")
+    database_url = settings.DATABASE_URL
+    engine_kwargs = {"echo": False}
 
 engine = create_engine(database_url, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
